@@ -6,9 +6,11 @@
 [前端源码地址](https://github.com/flywithbug-vue-admin/vue-eladmin)
 
 #### 启动须知
-  1. 参考 ``` config_simple.json ``` 添加启动配置文件
+  1. 参考 ``` config_simple.json ``` 添加配置文件（config.json）
   2. mongo数据库有两个：业务服务（doc_manager）和监控(monitor)
   3. 配置好启动文件之后，运行 ``` go run main.go ``` 即可启动服务
+
+
 
 - **go主要框架** 
 ``` 
