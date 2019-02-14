@@ -22,8 +22,8 @@ type responseVisit struct {
 	DayApi     int `json:"dayApi"`
 	TotalApi   int `json:"totalApi"`
 
-	DayIP   int `json:"dayIp"`
-	TotalIp int `json:"totalIp"`
+	DayUV   int `json:"dayUV"`
+	TotalUV int `json:"totalUV"`
 }
 
 func visitHandler(c *gin.Context) {
@@ -45,13 +45,13 @@ func visitHandler(c *gin.Context) {
 	resVisit.DayApi, _ = vApi.TotalSumCount(query)
 	monitorCount, _ = monitorCount.FindOne(bson.M{"monitor": MonitorVisit, "time_date": timeF}) //日访问
 	resVisit.DayVisit = monitorCount.Count
-	resVisit.DayIP, _ = vUId.TotalCount(query, nil)
+	resVisit.DayUV, _ = vUId.TotalCount(query, nil)
 
 	query = bson.M{"time_date": bson.M{"$regex": "", "$options": "i"}}
 	resVisit.TotalApi, _ = vApi.TotalSumCount(query)
 	resVisit.TotalVisit, _ = monitorCount.TotalSumCount(query) //总访问
 
-	resVisit.TotalIp, _ = vUId.TotalCount(nil, nil)
+	resVisit.TotalUV, _ = vUId.TotalCount(nil, nil)
 
 	aRes.AddResponseInfo("visit", resVisit)
 }
