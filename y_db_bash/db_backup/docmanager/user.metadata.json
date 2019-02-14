@@ -1,0 +1,1 @@
+{"options":{},"indexes":[{"v":1,"key":{"_id":1},"name":"_id_","ns":"docmanager.user"},{"v":1,"unique":true,"key":{"username":1},"name":"c_user_f_username_index","ns":"docmanager.user","sparse":true},{"v":1,"unique":true,"key":{"email":1},"name":"c_user_f_email_index","ns":"docmanager.user","sparse":true}]}

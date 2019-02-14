@@ -1,0 +1,1 @@
+{"options":{},"indexes":[{"v":1,"key":{"_id":1},"name":"_id_","ns":"docmanager.app_manager"},{"v":1,"unique":true,"key":{"user_id":1,"app_id":1},"name":"c_userId_f_appId_index","ns":"docmanager.app_manager","sparse":true}]}

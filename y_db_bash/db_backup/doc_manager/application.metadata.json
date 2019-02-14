@@ -1,0 +1,1 @@
+{"options":{},"indexes":[{"v":2,"key":{"_id":1},"name":"_id_","ns":"doc_manager.application"},{"v":2,"unique":true,"key":{"bundle_id":1},"name":"c_app_f_bundle_id_index","ns":"doc_manager.application","sparse":true},{"v":2,"unique":true,"key":{"name":1},"name":"c_app_f_name_index","ns":"doc_manager.application","sparse":true}],"uuid":"fdc7454f8a2248b5926a15d9e7d7319d"}

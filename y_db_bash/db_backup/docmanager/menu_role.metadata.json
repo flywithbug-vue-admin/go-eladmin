@@ -1,0 +1,1 @@
+{"options":{},"indexes":[{"v":1,"key":{"_id":1},"name":"_id_","ns":"docmanager.menu_role"},{"v":1,"unique":true,"key":{"role_id":1,"menu_id":1},"name":"c_menu_f_role_index","ns":"docmanager.menu_role","sparse":true}]}

@@ -1,0 +1,26 @@
+{
+  "port":":6201",
+  "static_path":"./aqt/dist/",
+  "private_key_path":"./key_sources/private_key",
+  "public_key_path":"./key_sources/public_key.pub",
+  "local_file_path": "../image/",
+  "env": "",
+  "mail_config":{
+    "host":"smtp.163.com",
+    "port":465,
+    "username":"**@163.com",
+    "password":"***"
+  },
+  "db_config":{
+    "url": "127.0.0.1:27017",
+    "db_name": "doc_manager",
+    "force_sync":true
+  },
+  "monitor_db_config":{
+    "url": "127.0.0.1:27017",
+    "db_name": "monitor",
+    "force_sync":true
+  },
+  "router_prefix":"/api",
+  "auth_prefix":""
+}

@@ -1,0 +1,1 @@
+{"options":{},"indexes":[{"v":2,"key":{"_id":1},"name":"_id_","ns":"doc_manager.app_version"},{"v":2,"unique":true,"key":{"version":1,"app_id":1},"name":"c_appVersion_f_version_f_appId_index","ns":"doc_manager.app_version","sparse":true}],"uuid":"462179cb2c574a74ab243d9147f75736"}
