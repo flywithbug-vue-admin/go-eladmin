@@ -16,7 +16,7 @@ var Routers = []handler_common.GinHandleFunc{
 		Route:      "/tools/model",
 	},
 	{
-		Handler:    updateApplicationRelationHandler, //添加模型属性
+		Handler:    updateApplicationRelationHandler, //添加应用和模型关联
 		RouterType: handler_common.RouterTypeNeedAuth,
 		Method:     "PUT",
 		Route:      "/tools/model/apps",

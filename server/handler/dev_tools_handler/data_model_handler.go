@@ -259,7 +259,7 @@ func listHandler(c *gin.Context) {
 	page, _ := strconv.Atoi(c.Query("page"))
 	sort := c.Query("sort")
 	name := c.Query("name")
-
+	//appId, _ := strconv.ParseInt(c.Query("app_id"), 10, 64)
 	if strings.EqualFold(sort, "-id") {
 		sort = "-_id"
 	} else if strings.EqualFold(sort, "+id") {

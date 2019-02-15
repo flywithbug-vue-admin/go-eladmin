@@ -240,7 +240,10 @@ func (d DataModel) FindOne(query, selector interface{}) (dm DataModel, err error
 		return
 	}
 	dm.Apps, _ = d.fetchApplications(nil)
-	return
+	result := make([]DataModel, 1)
+	result[0] = dm
+	err = fetchOwnerAndAttributes(result)
+	return result[0], err
 }
 
 func (d DataModel) fetchApplications(selector interface{}) (results []model_app.Application, err error) {
@@ -341,13 +344,21 @@ func (d DataModel) TotalCount(query, selector interface{}) (int, error) {
 
 func (d DataModel) FindPageFilter(page, limit int, query, selector interface{}, fields ...string) ([]DataModel, error) {
 	result, err := d.findPage(page, limit, query, selector, fields...)
-	for index := range result {
+	if err != nil {
+		return nil, err
+	}
+	err = fetchOwnerAndAttributes(result)
+	return result, err
+}
+
+func fetchOwnerAndAttributes(result []DataModel) error {
+	for index := 0; index < len(result); index++ {
 		if result[index].Owner.Id > 0 {
 			user := model_user.User{}
 			user.Id = result[index].Owner.Id
 			user, err := user.FindOne()
 			if err != nil {
-				return result, err
+				return err
 			}
 			result[index].Owner = user
 		}
@@ -358,11 +369,12 @@ func (d DataModel) FindPageFilter(page, limit int, query, selector interface{}, 
 				dm.Id = result[index].Attributes[index1].ModelId
 				dm, err := dm.FindOne(bson.M{"_id": dm.Id}, nil)
 				if err != nil {
-					return nil, err
+					return err
 				}
 				result[index].Attributes[index1].ModelName = dm.Name
 			}
 		}
+		//result[index].Apps, _ = result[index].fetchApplications(nil)
 	}
-	return result, err
+	return nil
 }

@@ -69,10 +69,20 @@ func (a AppDataModel) findPage(page, limit int, query, selector interface{}, fie
 	return
 }
 
+func (a AppDataModel) TotalCount(query, selector interface{}) (int, error) {
+	return a.totalCount(query, selector)
+}
+
+func (a AppDataModel) FindPageFilter(page, limit int, query, selector interface{}, fields ...string) (apps []AppDataModel, err error) {
+	apps, err = a.findPage(page, limit, query, selector, fields...)
+	return
+}
+
 func (a AppDataModel) FindOne(query, selector interface{}) (role AppDataModel, err error) {
 	role, err = a.findOne(query, selector)
 	return
 }
+
 func (a AppDataModel) FindAll(query, selector interface{}) (results []AppDataModel, err error) {
 	results = []AppDataModel{}
 	return a.findAll(query, selector)
