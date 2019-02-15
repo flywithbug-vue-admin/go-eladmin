@@ -285,7 +285,7 @@ func listHandler(c *gin.Context) {
 	}
 	if appId > 0 {
 		am := model_app_data_model.AppDataModel{}
-		totalCount, _ := am.TotalCount(query, nil)
+		totalCount, _ := am.TotalCount(bson.M{"app_id": appId}, nil)
 		result, err := am.FindPageFilter(page, limit, bson.M{"app_id": appId}, nil, sort)
 		if err != nil {
 			log4go.Error(handler_common.RequestId(c) + err.Error())
