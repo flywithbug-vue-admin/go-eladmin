@@ -351,9 +351,16 @@ func (d DataModel) FindPageFilter(page, limit int, query, selector interface{}, 
 			}
 			result[index].Owner = user
 		}
+
 		for index1 := range result[index].Attributes {
 			if result[index].Attributes[index1].ModelId > 0 {
-
+				dm := DataModel{}
+				dm.Id = result[index].Attributes[index1].ModelId
+				dm, err := dm.FindOne(bson.M{"_id": dm.Id}, nil)
+				if err != nil {
+					return nil, err
+				}
+				result[index].Attributes[index1].ModelName = dm.Name
 			}
 		}
 	}
