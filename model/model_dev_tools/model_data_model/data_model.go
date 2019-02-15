@@ -39,10 +39,6 @@ const (
 	modelAttributeTypeObject = "Object" //模型
 )
 
-var (
-	ModelTypeStatus = [...]string{"Undefined", "String", "Int", "Bool", "Object", "Array"}
-)
-
 const (
 	DataModelPermissionALL    = "Data_Model_ALL"
 	DataModelPermissionCreate = "Data_Model_CREATE"
@@ -67,7 +63,7 @@ type Attribute struct {
 	ModelId   int64  `json:"model_id,omitempty" bson:"model_id,omitempty"`
 	Default   string `json:"default,omitempty" bson:"default,omitempty"`   //默认值
 	Required  bool   `json:"required,omitempty" bson:"required,omitempty"` //是否必填 RequestPara 使用
-	Desc      string `json:"desc,omitempty" bson:"desc,omitempty"`         //属性说明
+	Comments  string `json:"comments,omitempty" bson:"comments,omitempty"` //属性说明
 }
 
 type DataModel struct {
@@ -354,6 +350,11 @@ func (d DataModel) FindPageFilter(page, limit int, query, selector interface{}, 
 				return result, err
 			}
 			result[index].Owner = user
+		}
+		for index1 := range result[index].Attributes {
+			if result[index].Attributes[index1].ModelId > 0 {
+
+			}
 		}
 	}
 	return result, err
