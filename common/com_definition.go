@@ -63,15 +63,3 @@ func Response(c *gin.Context) interface{} {
 	}
 	return para
 }
-
-func ResponseCode(c *gin.Context) int {
-	o, ok := c.Get(KeyContextResponseCode)
-	if !ok {
-		return -1
-	}
-	responseCode, ok := o.(int)
-	if !ok {
-		return -1
-	}
-	return responseCode
-}

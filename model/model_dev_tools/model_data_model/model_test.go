@@ -52,17 +52,8 @@ func TestDataModel_RemoveAttribute(t *testing.T) {
 	if err != nil {
 		panic(err)
 	}
-
 }
 
 func TestPipe(t *testing.T) {
-	//mongo.RegisterMongo("127.0.0.1:27017", "doc_manager")
-	//permission := model_permission.Permission{}
-	//
-	//list, err := permission.FetchTreeList(nil)
-	//if err != nil {
-	//	panic(err)
-	//}
-	//js, _ := json.Marshal(list)
-	//fmt.Println(string(js))
+
 }

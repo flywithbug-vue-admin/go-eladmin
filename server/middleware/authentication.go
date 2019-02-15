@@ -45,7 +45,6 @@ func JWTAuthMiddleware() gin.HandlerFunc {
 			}
 			sync_map.SetKeyValue(token)
 		}
-
 		c.Set(common.KeyContextUserId, claims.UserId)
 		c.Next()
 	}

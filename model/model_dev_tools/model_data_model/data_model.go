@@ -7,6 +7,7 @@ import (
 	"go-eladmin/model/a_mongo_index"
 	"go-eladmin/model/model_app"
 	"go-eladmin/model/model_app_data_model"
+	"go-eladmin/model/model_user"
 	"go-eladmin/model/shareDB"
 	"regexp"
 	"time"
@@ -19,15 +20,23 @@ import (
 type typeStatus int
 
 const (
-	modelAttributeTypeUndefine typeStatus = iota //待定
-	//基础类型
-	modelAttributeTypeString //String类型
-	modelAttributeTypeInt    //Int类型
-	modelAttributeTypeBool   //布尔类型
-	modelAttributeTypeArray  //数组 （基础类型或者模型）
+//modelAttributeTypeUndefine typeStatus = iota //待定
+//基础类型
+//modelAttributeTypeString //String类型
+//modelAttributeTypeInt    //Int类型
+//modelAttributeTypeBool   //布尔类型
+//modelAttributeTypeArray  //数组 （基础类型或者模型）
+//
+//modelAttributeTypeObject //模型
+)
 
-	modelAttributeTypeObject //模型
-
+const (
+	modelAttributeTypeString = "String" //String类型
+	modelAttributeTypeInt    = "Int"    //Int类型
+	modelAttributeTypeFloat  = "Float"  //浮点数
+	modelAttributeTypeBool   = "Bool"   //布尔类型
+	modelAttributeTypeArray  = "Array"  //数组 （基础类型或者模型）
+	modelAttributeTypeObject = "Object" //模型
 )
 
 var (
@@ -51,14 +60,13 @@ const (
 )
 
 type Attribute struct {
-	Type       typeStatus `json:"type,omitempty" bson:"type,omitempty"` //int string list bool
-	TypeStatus string     `json:"type_status,omitempty" bson:"type_status,omitempty"`
-	Name       string     `json:"name,omitempty" bson:"name,omitempty"`
+	Type string `json:"type,omitempty" bson:"type,omitempty"` //数据类型
+	Name string `json:"name,omitempty" bson:"name,omitempty"`
 	//attribute是数组时，数组内元素对象
 	ModelName string `json:"model_name,omitempty" bson:"model_name,omitempty"`
 	ModelId   int64  `json:"model_id,omitempty" bson:"model_id,omitempty"`
 	Default   string `json:"default,omitempty" bson:"default,omitempty"`   //默认值
-	Required  bool   `json:"required,omitempty" bson:"required,omitempty"` //是否必填
+	Required  bool   `json:"required,omitempty" bson:"required,omitempty"` //是否必填 RequestPara 使用
 	Desc      string `json:"desc,omitempty" bson:"desc,omitempty"`         //属性说明
 }
 
@@ -66,9 +74,11 @@ type DataModel struct {
 	Id         int64                   `json:"id,omitempty" bson:"_id,omitempty"`
 	Name       string                  `json:"name,omitempty" bson:"name,omitempty"` //过滤中文名
 	Alias      string                  `json:"alias,omitempty"  bson:"alias,omitempty"`
+	Desc       string                  `json:"desc,omitempty" bson:"desc,omitempty"` //模型说明
 	CreateTime int64                   `json:"create_time,omitempty" bson:"create_time,omitempty"`
 	Attributes []Attribute             `json:"attributes,omitempty" bson:"attributes,omitempty"` //模型的属性表
 	Apps       []model_app.Application `json:"apps,omitempty" bson:"apps,omitempty"`             //不存入数据库
+	Owner      model_user.User         `json:"owner,omitempty" bson:"owner,omitempty"`           //模型负责人（初始为创建人）
 }
 
 func (d DataModel) ToJson() string {
@@ -137,7 +147,6 @@ func (d DataModel) AddAttribute(a Attribute) error {
 	if d.isExistAttribute(a) {
 		return fmt.Errorf("duplicate attribute name:%s", a.Name)
 	}
-	a.TypeStatus = ModelTypeStatus[a.Type]
 	update := bson.M{"$addToSet": bson.M{"attributes": a}}
 	change := mgo.Change{
 		Update: update,
@@ -151,17 +160,41 @@ func (d DataModel) AddAttribute(a Attribute) error {
 
 func (d DataModel) AddAttributes(list []Attribute) error {
 	for _, item := range list {
-		if int(item.Type) >= len(ModelTypeStatus) || int(item.Type) < 0 {
-			return fmt.Errorf("type Status:%d not found", item.Type)
-		}
-		fmt.Println("=====:", item.TypeStatus)
-		if item.Type == modelAttributeTypeObject {
+		switch item.Type {
+		case modelAttributeTypeString,
+			modelAttributeTypeInt,
+			modelAttributeTypeFloat,
+			modelAttributeTypeBool:
+			//基础数据类型不处理
+		case modelAttributeTypeObject:
 			m, err := d.FindOne(bson.M{"_id": item.ModelId}, nil)
 			if err != nil {
-				return fmt.Errorf("model attribute name:%s Type:%d id:%d not found",
+				return fmt.Errorf("model attribute name:%s Type:%s id:%d not found",
 					item.Name, item.Type, d.Id)
 			}
 			item.ModelName = m.Name
+		case modelAttributeTypeArray:
+			if item.ModelId > 0 {
+				m, err := d.FindOne(bson.M{"_id": item.ModelId}, nil)
+				if err != nil {
+					return fmt.Errorf("model attribute name:%s Type:%d id:%d not found",
+						item.Name, item.Type, d.Id)
+				}
+				item.ModelName = m.Name
+			} else {
+				switch item.ModelName {
+				case modelAttributeTypeString,
+					modelAttributeTypeInt,
+					modelAttributeTypeFloat,
+					modelAttributeTypeBool:
+					//基础数据类型不处理直接使用
+				default:
+					return fmt.Errorf("属性类型未定义")
+				}
+				return fmt.Errorf("数组元素属性类型未指定")
+			}
+		default:
+			return fmt.Errorf("属性类型未定义")
 		}
 		err := d.AddAttribute(item)
 		if err != nil {
@@ -177,6 +210,13 @@ func checkNameReg(name string) bool {
 		return false
 	}
 	return true
+}
+
+func (d DataModel) RemoveAttributes(list []Attribute) error {
+	for _, item := range list {
+		d.RemoveAttribute(item)
+	}
+	return nil
 }
 
 func (d DataModel) RemoveAttribute(a Attribute) error {
@@ -302,6 +342,19 @@ func (d DataModel) Remove() error {
 func (d DataModel) TotalCount(query, selector interface{}) (int, error) {
 	return d.totalCount(query, selector)
 }
+
 func (d DataModel) FindPageFilter(page, limit int, query, selector interface{}, fields ...string) ([]DataModel, error) {
-	return d.findPage(page, limit, query, selector, fields...)
+	result, err := d.findPage(page, limit, query, selector, fields...)
+	for index := range result {
+		if result[index].Owner.Id > 0 {
+			user := model_user.User{}
+			user.Id = result[index].Owner.Id
+			user, err := user.FindOne()
+			if err != nil {
+				return result, err
+			}
+			result[index].Owner = user
+		}
+	}
+	return result, err
 }

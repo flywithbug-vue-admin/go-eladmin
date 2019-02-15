@@ -5,12 +5,14 @@ import (
 	"fmt"
 	"go-eladmin/common"
 	"go-eladmin/model"
+	"go-eladmin/model/model_app"
 	"go-eladmin/model/model_dev_tools/model_data_model"
 	"go-eladmin/server/handler/check_permission"
 	"go-eladmin/server/handler/handler_common"
 	"net/http"
 	"regexp"
 	"strconv"
+	"strings"
 
 	"gopkg.in/mgo.v2/bson"
 
@@ -24,9 +26,9 @@ var (
 )
 
 type paraAttribute struct {
-	ModelId       int64                      `json:"model_id"`
-	Attribute     model_data_model.Attribute `json:"attribute"`      //修改或增加的属性
-	DropAttribute model_data_model.Attribute `json:"drop_attribute"` //删除的属性
+	ModelId        int64                        `json:"model_id,omitempty"`
+	Attributes     []model_data_model.Attribute `json:"attributes,omitempty"`      //批量修改或增加的属性
+	DropAttributes []model_data_model.Attribute `json:"drop_attributes,omitempty"` //批量删除的属性
 }
 
 func (u paraAttribute) ToJson() string {
@@ -60,6 +62,8 @@ func addDataModelHandler(c *gin.Context) {
 		aRes.SetErrorInfo(http.StatusBadRequest, msg)
 		return
 	}
+	userId := common.UserId(c)
+	para.Owner.Id = userId
 	id, err := para.Insert()
 	if err != nil {
 		log4go.Info(handler_common.RequestId(c) + err.Error())
@@ -95,17 +99,13 @@ func modifyAttributeHandler(c *gin.Context) {
 	}
 	dm := model_data_model.DataModel{}
 	dm.Id = para.ModelId
-	if len(para.DropAttribute.Name) > 0 {
-		err = dm.RemoveAttribute(para.DropAttribute)
-		if err != nil {
-			log4go.Info(handler_common.RequestId(c) + err.Error())
-			aRes.SetErrorInfo(http.StatusBadRequest, "invalid: "+err.Error())
-			return
-		}
+
+	if len(para.DropAttributes) > 0 {
+		dm.RemoveAttributes(para.DropAttributes)
 	}
-	if len(para.Attribute.Name) > 0 {
-		dm.RemoveAttribute(para.Attribute)
-		err = dm.AddAttribute(para.Attribute)
+	if len(para.Attributes) > 0 {
+		dm.RemoveAttributes(para.Attributes)
+		err = dm.AddAttributes(para.Attributes)
 		if err != nil {
 			log4go.Info(handler_common.RequestId(c) + err.Error())
 			aRes.SetErrorInfo(http.StatusBadRequest, "invalid: "+err.Error())
@@ -242,4 +242,54 @@ func getDataModelHandler(c *gin.Context) {
 		return
 	}
 	aRes.AddResponseInfo("model", para)
+}
+
+func listHandler(c *gin.Context) {
+	aRes := model.NewResponse()
+	defer func() {
+		c.Set(common.KeyContextResponse, aRes)
+		c.JSON(http.StatusOK, aRes)
+	}()
+	if check_permission.CheckNoPermission(c, model_app.ApplicationPermissionSelect) {
+		log4go.Info(handler_common.RequestId(c) + "has no permission")
+		aRes.SetErrorInfo(http.StatusBadRequest, "has no permission")
+		return
+	}
+	limit, _ := strconv.Atoi(c.Query("size"))
+	page, _ := strconv.Atoi(c.Query("page"))
+	sort := c.Query("sort")
+	name := c.Query("name")
+
+	if strings.EqualFold(sort, "-id") {
+		sort = "-_id"
+	} else if strings.EqualFold(sort, "+id") {
+		sort = "+_id"
+	} else if len(sort) == 0 {
+		sort = "+_id"
+	}
+	if limit == 0 {
+		limit = 10
+	}
+	if page != 0 {
+		page--
+	}
+	userId := common.UserId(c)
+	if userId <= 0 {
+		aRes.SetErrorInfo(http.StatusUnauthorized, "user not found")
+		return
+	}
+	query := bson.M{}
+	if len(name) > 0 {
+		query["name"] = bson.M{"$regex": name, "$options": "i"}
+	}
+	var dm = model_data_model.DataModel{}
+	totalCount, _ := dm.TotalCount(query, nil)
+	list, err := dm.FindPageFilter(page, limit, query, nil, sort)
+	if err != nil {
+		log4go.Error(handler_common.RequestId(c) + err.Error())
+		aRes.SetErrorInfo(http.StatusUnauthorized, "apps find error"+err.Error())
+		return
+	}
+	aRes.AddResponseInfo("list", list)
+	aRes.AddResponseInfo("total", totalCount)
 }
