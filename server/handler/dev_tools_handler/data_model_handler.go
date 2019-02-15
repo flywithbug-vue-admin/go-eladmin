@@ -6,6 +6,7 @@ import (
 	"go-eladmin/common"
 	"go-eladmin/model"
 	"go-eladmin/model/model_app"
+	"go-eladmin/model/model_app_data_model"
 	"go-eladmin/model/model_dev_tools/model_data_model"
 	"go-eladmin/server/handler/check_permission"
 	"go-eladmin/server/handler/handler_common"
@@ -259,7 +260,7 @@ func listHandler(c *gin.Context) {
 	page, _ := strconv.Atoi(c.Query("page"))
 	sort := c.Query("sort")
 	name := c.Query("name")
-	//appId, _ := strconv.ParseInt(c.Query("app_id"), 10, 64)
+	appId, _ := strconv.ParseInt(c.Query("appId"), 10, 64)
 	if strings.EqualFold(sort, "-id") {
 		sort = "-_id"
 	} else if strings.EqualFold(sort, "+id") {
@@ -281,6 +282,30 @@ func listHandler(c *gin.Context) {
 	query := bson.M{}
 	if len(name) > 0 {
 		query["name"] = bson.M{"$regex": name, "$options": "i"}
+	}
+	if appId > 0 {
+		am := model_app_data_model.AppDataModel{}
+		totalCount, _ := am.TotalCount(query, nil)
+
+		result, err := am.FindAll(bson.M{"app_id": appId}, nil)
+		if err != nil {
+			log4go.Error(handler_common.RequestId(c) + err.Error())
+			aRes.SetErrorInfo(http.StatusUnauthorized, "apps find error"+err.Error())
+			return
+		}
+		listA := make([]model_data_model.DataModel, 0)
+		for _, item := range result {
+			dm := model_data_model.DataModel{}
+			dm, err := dm.FindOne(bson.M{"_id": item.ModelId}, nil)
+			if err != nil {
+				am.RemoveModelId(item.ModelId)
+				continue
+			}
+			listA = append(listA, dm)
+		}
+		aRes.AddResponseInfo("list", listA)
+		aRes.AddResponseInfo("total", totalCount)
+		return
 	}
 	var dm = model_data_model.DataModel{}
 	totalCount, _ := dm.TotalCount(query, nil)

@@ -246,6 +246,17 @@ func (d DataModel) FindOne(query, selector interface{}) (dm DataModel, err error
 	return result[0], err
 }
 
+func (d DataModel) FindSimpleOne(query, selector interface{}) (dm DataModel, err error) {
+	if query == nil {
+		query = bson.M{"_id": d.Id}
+	}
+	dm, err = d.findOne(query, selector)
+	if err != nil {
+		return
+	}
+	return dm, err
+}
+
 func (d DataModel) fetchApplications(selector interface{}) (results []model_app.Application, err error) {
 	if selector == nil {
 		selector = bson.M{"_id": 1, "name": 1}
