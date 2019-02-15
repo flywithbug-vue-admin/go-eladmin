@@ -122,7 +122,6 @@ func removeAttributeHandler(c *gin.Context) {
 		return
 	}
 	c.Set(common.KeyContextPara, para.ToJson())
-
 	dm := model_data_model.DataModel{}
 	dm.Id = para.ModelId
 	err = dm.RemoveAttribute(para.Attribute)
