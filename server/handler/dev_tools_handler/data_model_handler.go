@@ -27,7 +27,7 @@ var (
 )
 
 type paraAttribute struct {
-	ModelId        int64                        `json:"model_id,omitempty"`
+	Id             int64                        `json:"id,omitempty"`
 	Attributes     []model_data_model.Attribute `json:"attributes,omitempty"`      //批量修改或增加的属性
 	DropAttributes []model_data_model.Attribute `json:"drop_attributes,omitempty"` //批量删除的属性
 }
@@ -93,13 +93,13 @@ func modifyAttributeHandler(c *gin.Context) {
 		return
 	}
 	c.Set(common.KeyContextPara, para.ToJson())
-	if para.ModelId == 0 {
+	if para.Id == 0 {
 		log4go.Info(handler_common.RequestId(c) + "id is 0")
 		aRes.SetErrorInfo(http.StatusBadRequest, "id is 0")
 		return
 	}
 	dm := model_data_model.DataModel{}
-	dm.Id = para.ModelId
+	dm.Id = para.Id
 
 	if len(para.DropAttributes) > 0 {
 		dm.RemoveAttributes(para.DropAttributes)
