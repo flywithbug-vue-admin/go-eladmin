@@ -295,9 +295,9 @@ func listHandler(c *gin.Context) {
 		listA := make([]model_data_model.DataModel, 0)
 		for _, item := range result {
 			dm := model_data_model.DataModel{}
-			dm, err := dm.FindOne(bson.M{"_id": item.ModelId}, nil)
+			query["_id"] = item.ModelId
+			dm, err := dm.FindOne(query, nil)
 			if err != nil {
-				am.RemoveModelId(item.ModelId)
 				continue
 			}
 			listA = append(listA, dm)
