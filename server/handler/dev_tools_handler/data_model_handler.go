@@ -24,8 +24,9 @@ var (
 )
 
 type paraAttribute struct {
-	ModelId   int64                      `json:"model_id"`
-	Attribute model_data_model.Attribute `json:"attribute"`
+	ModelId       int64                      `json:"model_id"`
+	Attribute     model_data_model.Attribute `json:"attribute"`      //修改或增加的属性
+	DropAttribute model_data_model.Attribute `json:"drop_attribute"` //删除的属性
 }
 
 func (u paraAttribute) ToJson() string {
@@ -68,7 +69,7 @@ func addDataModelHandler(c *gin.Context) {
 	aRes.AddResponseInfo("id", id)
 }
 
-func addAttributeHandler(c *gin.Context) {
+func modifyAttributeHandler(c *gin.Context) {
 	aRes := model.NewResponse()
 	defer func() {
 		c.Set(common.KeyContextResponse, aRes)
@@ -94,41 +95,22 @@ func addAttributeHandler(c *gin.Context) {
 	}
 	dm := model_data_model.DataModel{}
 	dm.Id = para.ModelId
-	err = dm.AddAttribute(para.Attribute)
-	if err != nil {
-		log4go.Info(handler_common.RequestId(c) + err.Error())
-		aRes.SetErrorInfo(http.StatusBadRequest, "invalid: "+err.Error())
-		return
+	if len(para.DropAttribute.Name) > 0 {
+		err = dm.RemoveAttribute(para.DropAttribute)
+		if err != nil {
+			log4go.Info(handler_common.RequestId(c) + err.Error())
+			aRes.SetErrorInfo(http.StatusBadRequest, "invalid: "+err.Error())
+			return
+		}
 	}
-	aRes.SetSuccess()
-}
-
-func removeAttributeHandler(c *gin.Context) {
-	aRes := model.NewResponse()
-	defer func() {
-		c.Set(common.KeyContextResponse, aRes)
-		c.JSON(http.StatusOK, aRes)
-	}()
-	if check_permission.CheckNoPermission(c, model_data_model.DataModelPermissionDelete) {
-		log4go.Info(handler_common.RequestId(c) + "has no permission")
-		aRes.SetErrorInfo(http.StatusBadRequest, "has no permission")
-		return
-	}
-	para := new(paraAttribute)
-	err := c.BindJSON(para)
-	if err != nil {
-		log4go.Info(handler_common.RequestId(c) + err.Error())
-		aRes.SetErrorInfo(http.StatusBadRequest, "para invalid"+err.Error())
-		return
-	}
-	c.Set(common.KeyContextPara, para.ToJson())
-	dm := model_data_model.DataModel{}
-	dm.Id = para.ModelId
-	err = dm.RemoveAttribute(para.Attribute)
-	if err != nil {
-		log4go.Info(handler_common.RequestId(c) + err.Error())
-		aRes.SetErrorInfo(http.StatusBadRequest, "invalid: "+err.Error())
-		return
+	if len(para.Attribute.Name) > 0 {
+		dm.RemoveAttribute(para.Attribute)
+		err = dm.AddAttribute(para.Attribute)
+		if err != nil {
+			log4go.Info(handler_common.RequestId(c) + err.Error())
+			aRes.SetErrorInfo(http.StatusBadRequest, "invalid: "+err.Error())
+			return
+		}
 	}
 	aRes.SetSuccess()
 }

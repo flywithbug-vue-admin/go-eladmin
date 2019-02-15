@@ -53,11 +53,13 @@ const (
 type Attribute struct {
 	Type       typeStatus `json:"type,omitempty" bson:"type,omitempty"` //int string list bool
 	TypeStatus string     `json:"type_status,omitempty" bson:"type_status,omitempty"`
-
-	Name string `json:"name,omitempty" bson:"name,omitempty"`
+	Name       string     `json:"name,omitempty" bson:"name,omitempty"`
 	//attribute是数组时，数组内元素对象
 	ModelName string `json:"model_name,omitempty" bson:"model_name,omitempty"`
 	ModelId   int64  `json:"model_id,omitempty" bson:"model_id,omitempty"`
+	Default   string `json:"default,omitempty" bson:"default,omitempty"`   //默认值
+	Required  bool   `json:"required,omitempty" bson:"required,omitempty"` //是否必填
+	Desc      string `json:"desc,omitempty" bson:"desc,omitempty"`         //属性说明
 }
 
 type DataModel struct {
@@ -135,7 +137,7 @@ func (d DataModel) AddAttribute(a Attribute) error {
 	if d.isExistAttribute(a) {
 		return fmt.Errorf("duplicate attribute name:%s", a.Name)
 	}
-
+	a.TypeStatus = ModelTypeStatus[a.Type]
 	update := bson.M{"$addToSet": bson.M{"attributes": a}}
 	change := mgo.Change{
 		Update: update,
@@ -152,7 +154,6 @@ func (d DataModel) AddAttributes(list []Attribute) error {
 		if int(item.Type) >= len(ModelTypeStatus) || int(item.Type) < 0 {
 			return fmt.Errorf("type Status:%d not found", item.Type)
 		}
-		item.TypeStatus = ModelTypeStatus[item.Type]
 		fmt.Println("=====:", item.TypeStatus)
 		if item.Type == modelAttributeTypeObject {
 			m, err := d.FindOne(bson.M{"_id": item.ModelId}, nil)
