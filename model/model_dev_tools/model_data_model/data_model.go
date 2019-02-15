@@ -63,7 +63,7 @@ type Attribute struct {
 type DataModel struct {
 	Id         int64                   `json:"id,omitempty" bson:"_id,omitempty"`
 	Name       string                  `json:"name,omitempty" bson:"name,omitempty"` //过滤中文名
-	Desc       string                  `json:"desc,omitempty" bson:"desc,omitempty"`
+	Alias      string                  `json:"alias,omitempty"  bson:"alias,omitempty"`
 	CreateTime int64                   `json:"create_time,omitempty" bson:"create_time,omitempty"`
 	Attributes []Attribute             `json:"attributes,omitempty" bson:"attributes,omitempty"` //模型的属性表
 	Apps       []model_app.Application `json:"apps,omitempty" bson:"apps,omitempty"`             //不存入数据库
@@ -135,6 +135,7 @@ func (d DataModel) AddAttribute(a Attribute) error {
 	if d.isExistAttribute(a) {
 		return fmt.Errorf("duplicate attribute name:%s", a.Name)
 	}
+
 	update := bson.M{"$addToSet": bson.M{"attributes": a}}
 	change := mgo.Change{
 		Update: update,
@@ -152,6 +153,7 @@ func (d DataModel) AddAttributes(list []Attribute) error {
 			return fmt.Errorf("type Status:%d not found", item.Type)
 		}
 		item.TypeStatus = ModelTypeStatus[item.Type]
+		fmt.Println("=====:", item.TypeStatus)
 		if item.Type == modelAttributeTypeObject {
 			m, err := d.FindOne(bson.M{"_id": item.ModelId}, nil)
 			if err != nil {
@@ -227,6 +229,7 @@ func (d DataModel) fetchApplications(selector interface{}) (results []model_app.
 	return
 }
 
+//插入基本信息
 func (d DataModel) Insert() (id int64, err error) {
 	id, err = mongo.GetIncrementId(shareDB.DocManagerDBName(), dataModelCollection)
 	if err != nil {
@@ -237,39 +240,55 @@ func (d DataModel) Insert() (id int64, err error) {
 	}
 	d.CreateTime = time.Now().Unix()
 	d.Id = id
-	list := d.Apps
 	d.Apps = nil
+	d.Attributes = nil
 	err = d.insert(d)
 	if err != nil {
-		d.AddAttributes(d.Attributes)
+		return -1, err
 	}
-	d.Apps = list
-	d.updateApplication()
 	return id, err
 }
 
-func (d DataModel) updateApplication() {
+func (d DataModel) updateApplication(list []model_app.Application) error {
+	if !d.isExist(bson.M{"_id": d.Id}) {
+		return fmt.Errorf("datamodel not exist,Id:%d", d.Id)
+	}
 	aM := model_app_data_model.AppDataModel{}
-	//aM.RemoveModelId(d.Id)
-	for _, app := range d.Apps {
+	aM.RemoveModelId(d.Id)
+	for _, app := range list {
 		if app.Exist() {
 			aM.AppId = app.Id
 			aM.ModelId = d.Id
-			aM.Insert()
+			err := aM.Insert()
+			if err != nil {
+				return err
+			}
+		} else {
+			return fmt.Errorf("application not exist, Id:%d", app.Id)
 		}
 	}
+	return nil
+}
+
+func (d DataModel) UpdateAppRelation() (err error) {
+	if len(d.Apps) > 0 {
+		err = d.updateApplication(d.Apps)
+	} else {
+		return fmt.Errorf("apps 为空")
+	}
+	return
 }
 
 func (d DataModel) Update() error {
 	if len(d.Name) > 0 && !checkNameReg(d.Name) {
 		return fmt.Errorf("data_model name:%s not right", d.Name)
 	}
-	d.updateApplication()
+	//d.updateApplication(d.Apps)
 	d.Apps = nil
-	err := d.AddAttributes(d.Attributes)
-	if err != nil {
-		return err
-	}
+	//err := d.AddAttributes(d.Attributes)
+	//if err != nil {
+	//	return err
+	//}
 	d.Attributes = nil
 	return d.update(bson.M{"_id": d.Id}, d)
 }
@@ -281,6 +300,7 @@ func (d DataModel) Remove() error {
 	}
 	return d.remove(bson.M{"_id": d.Id})
 }
+
 func (d DataModel) TotalCount(query, selector interface{}) (int, error) {
 	return d.totalCount(query, selector)
 }
