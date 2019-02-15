@@ -224,6 +224,8 @@ func (d DataModel) fetchApplications(selector interface{}) (results []model_app.
 		app, err = app.FindOne(nil, nil)
 		if err == nil {
 			results = append(results, app)
+		} else {
+			item.Remove()
 		}
 	}
 	return
@@ -270,13 +272,8 @@ func (d DataModel) updateApplication(list []model_app.Application) error {
 	return nil
 }
 
-func (d DataModel) UpdateAppRelation() (err error) {
-	if len(d.Apps) > 0 {
-		err = d.updateApplication(d.Apps)
-	} else {
-		return fmt.Errorf("apps 为空")
-	}
-	return
+func (d DataModel) UpdateAppRelation() error {
+	return d.updateApplication(d.Apps)
 }
 
 func (d DataModel) Update() error {
