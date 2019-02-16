@@ -237,9 +237,6 @@ func getDataModelHandler(c *gin.Context) {
 	para := model_data_model.DataModel{}
 	para.Id = id
 	para, err := para.FindOne(bson.M{"_id": id}, nil)
-	if para.ParentId > 0 {
-		//para.Parent, _ = para.FindOne(bson.M{"_id": para.ParentId}, nil)
-	}
 	if err != nil {
 		log4go.Info(handler_common.RequestId(c) + err.Error())
 		aRes.SetErrorInfo(http.StatusBadRequest, "invalid: "+err.Error())
@@ -299,7 +296,7 @@ func listHandler(c *gin.Context) {
 		for _, item := range result {
 			dm := model_data_model.DataModel{}
 			query["_id"] = item.ModelId
-			dm, err := dm.FindOne(query, nil)
+			dm, err := dm.FindSimpleOne(query, nil)
 			if err != nil {
 				continue
 			}

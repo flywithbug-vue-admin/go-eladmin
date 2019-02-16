@@ -165,7 +165,7 @@ func (d DataModel) AddAttributes(list []Attribute) error {
 			modelAttributeTypeBool:
 			//基础数据类型不处理
 		case modelAttributeTypeObject:
-			m, err := d.FindOne(bson.M{"_id": item.ModelId}, nil)
+			m, err := d.FindSimpleOne(bson.M{"_id": item.ModelId}, nil)
 			if err != nil {
 				return fmt.Errorf("model attribute name:%s Type:%s id:%d not found",
 					item.Name, item.Type, d.Id)
@@ -173,7 +173,7 @@ func (d DataModel) AddAttributes(list []Attribute) error {
 			item.ModelName = m.Name
 		case modelAttributeTypeArray:
 			if item.ModelId > 0 {
-				m, err := d.FindOne(bson.M{"_id": item.ModelId}, nil)
+				m, err := d.FindSimpleOne(bson.M{"_id": item.ModelId}, nil)
 				if err != nil {
 					return fmt.Errorf("model attribute name:%s Type:%d id:%d not found",
 						item.Name, item.Type, d.Id)
@@ -233,6 +233,9 @@ func (d DataModel) isExistAttribute(a Attribute) bool {
 	return d.isExist(selector)
 }
 
+/**
+查询模型详细信息
+*/
 func (d DataModel) FindOne(query, selector interface{}) (dm DataModel, err error) {
 	if query == nil {
 		query = bson.M{"_id": d.Id}
@@ -249,10 +252,8 @@ func (d DataModel) FindOne(query, selector interface{}) (dm DataModel, err error
 		}
 		dm.Parent = parent
 	}
-
 	dm.Apps, _ = d.fetchApplications(nil)
 	result := make([]DataModel, 1)
-
 	result[0] = dm
 	err = fetchOwnerAndAttributes(result)
 	return result[0], err
@@ -370,7 +371,7 @@ func (d DataModel) FindPageFilter(page, limit int, query, selector interface{}, 
 	if err != nil {
 		return nil, err
 	}
-	err = fetchOwnerAndAttributes(result)
+	//err = fetchOwnerAndAttributes(result)
 	return result, err
 }
 
@@ -390,7 +391,7 @@ func fetchOwnerAndAttributes(result []DataModel) error {
 			if result[index].Attributes[index1].ModelId > 0 {
 				dm := DataModel{}
 				dm.Id = result[index].Attributes[index1].ModelId
-				dm, err := dm.FindOne(bson.M{"_id": dm.Id}, nil)
+				dm, err := dm.FindSimpleOne(bson.M{"_id": dm.Id}, nil)
 				if err != nil {
 					return err
 				}
