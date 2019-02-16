@@ -237,6 +237,9 @@ func getDataModelHandler(c *gin.Context) {
 	para := model_data_model.DataModel{}
 	para.Id = id
 	para, err := para.FindOne(bson.M{"_id": id}, nil)
+	if para.ParentId > 0 {
+		//para.Parent, _ = para.FindOne(bson.M{"_id": para.ParentId}, nil)
+	}
 	if err != nil {
 		log4go.Info(handler_common.RequestId(c) + err.Error())
 		aRes.SetErrorInfo(http.StatusBadRequest, "invalid: "+err.Error())

@@ -75,6 +75,8 @@ type DataModel struct {
 	Attributes []Attribute             `json:"attributes,omitempty" bson:"attributes,omitempty"` //模型的属性表
 	Apps       []model_app.Application `json:"apps,omitempty" bson:"apps,omitempty"`             //不存入数据库
 	Owner      model_user.User         `json:"owner,omitempty" bson:"owner,omitempty"`           //模型负责人（初始为创建人）
+	ParentId   int64                   `json:"parent_id,omitempty" bson:"parent_id,omitempty"`
+	Parent     interface{}             `json:"parent,omitempty" bson:"parent,omitempty"`
 }
 
 func (d DataModel) ToJson() string {
@@ -237,10 +239,20 @@ func (d DataModel) FindOne(query, selector interface{}) (dm DataModel, err error
 	}
 	dm, err = d.findOne(query, selector)
 	if err != nil {
-		return
+		return dm, err
 	}
+	if dm.ParentId > 0 {
+		query = bson.M{"_id": dm.ParentId}
+		parent, err := d.findOne(query, selector)
+		if err != nil {
+			return dm, err
+		}
+		dm.Parent = parent
+	}
+
 	dm.Apps, _ = d.fetchApplications(nil)
 	result := make([]DataModel, 1)
+
 	result[0] = dm
 	err = fetchOwnerAndAttributes(result)
 	return result[0], err
@@ -385,7 +397,6 @@ func fetchOwnerAndAttributes(result []DataModel) error {
 				result[index].Attributes[index1].ModelName = dm.Name
 			}
 		}
-		//result[index].Apps, _ = result[index].fetchApplications(nil)
 	}
 	return nil
 }
