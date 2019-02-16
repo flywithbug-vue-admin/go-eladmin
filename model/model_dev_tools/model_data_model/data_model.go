@@ -359,6 +359,9 @@ func (d DataModel) Remove() error {
 	if aM.Exist(bson.M{"model_id": d.Id}) {
 		return fmt.Errorf("model in use")
 	}
+	if d.isExist(bson.M{"parent_id": d.Id}) {
+		return fmt.Errorf("has son model")
+	}
 	return d.remove(bson.M{"_id": d.Id})
 }
 
