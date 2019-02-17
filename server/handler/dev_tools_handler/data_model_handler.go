@@ -115,39 +115,6 @@ func modifyAttributeHandler(c *gin.Context) {
 	aRes.SetSuccess()
 }
 
-func updateApplicationRelationHandler(c *gin.Context) {
-	aRes := model.NewResponse()
-	defer func() {
-		c.Set(common.KeyContextResponse, aRes)
-		c.JSON(http.StatusOK, aRes)
-	}()
-	if check_permission.CheckNoPermission(c, model_data_model.DataModelPermissionEdit) {
-		log4go.Info(handler_common.RequestId(c) + "has no permission")
-		aRes.SetErrorInfo(http.StatusBadRequest, "has no permission")
-		return
-	}
-	para := new(model_data_model.DataModel)
-	err := c.BindJSON(para)
-	if err != nil {
-		log4go.Info(handler_common.RequestId(c) + err.Error())
-		aRes.SetErrorInfo(http.StatusBadRequest, "para invalid"+err.Error())
-		return
-	}
-	c.Set(common.KeyContextPara, para.ToJson())
-	if para.Id == 0 {
-		log4go.Info(handler_common.RequestId(c) + "id is 0")
-		aRes.SetErrorInfo(http.StatusBadRequest, "id is 0")
-		return
-	}
-	err = para.UpdateAppRelation()
-	if err != nil {
-		log4go.Info(handler_common.RequestId(c) + err.Error())
-		aRes.SetErrorInfo(http.StatusBadRequest, "invalid: "+err.Error())
-		return
-	}
-	aRes.SetSuccess()
-}
-
 //更新alias或者name
 func updateDataModelHandler(c *gin.Context) {
 	aRes := model.NewResponse()

@@ -90,8 +90,11 @@ func (a Application) removeAll(selector interface{}) error {
 	return mongo.RemoveAll(shareDB.DocManagerDBName(), appCollection, selector)
 }
 
-func (a Application) Exist() bool {
-	return a.isExist(bson.M{"_id": a.Id})
+func (a Application) Exist(query interface{}) bool {
+	if query == nil {
+		query = bson.M{"_id": a.Id}
+	}
+	return a.isExist(query)
 }
 
 func (a *Application) Insert() error {

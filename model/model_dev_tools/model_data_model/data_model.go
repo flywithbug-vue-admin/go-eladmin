@@ -130,6 +130,10 @@ func (d DataModel) explain(pipeline, result interface{}) (results []DataModel, e
 	return
 }
 
+func (d DataModel) Exist(query interface{}) bool {
+	return d.isExist(query)
+}
+
 func (d DataModel) AddAttribute(a Attribute) error {
 	if !checkNameReg(a.Name) {
 		return fmt.Errorf("attribute name:%s not right", a.Name)
@@ -314,7 +318,7 @@ func (d DataModel) updateApplication(list []model_app.Application) error {
 	aM := model_app_data_model.AppDataModel{}
 	aM.RemoveModelId(d.Id)
 	for _, app := range list {
-		if app.Exist() {
+		if app.Exist(bson.M{"_id": app.Id}) {
 			aM.AppId = app.Id
 			aM.ModelId = d.Id
 			err := aM.Insert()
@@ -336,12 +340,7 @@ func (d DataModel) Update() error {
 	if len(d.Name) > 0 && !checkNameReg(d.Name) {
 		return fmt.Errorf("data_model name:%s not right", d.Name)
 	}
-	//d.updateApplication(d.Apps)
 	d.Apps = nil
-	//err := d.AddAttributes(d.Attributes)
-	//if err != nil {
-	//	return err
-	//}
 	d.Attributes = nil
 	return d.update(bson.M{"_id": d.Id}, d)
 }
