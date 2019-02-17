@@ -20,17 +20,6 @@ import (
 type typeStatus int
 
 const (
-//modelAttributeTypeUndefine typeStatus = iota //待定
-//基础类型
-//modelAttributeTypeString //String类型
-//modelAttributeTypeInt    //Int类型
-//modelAttributeTypeBool   //布尔类型
-//modelAttributeTypeArray  //数组 （基础类型或者模型）
-//
-//modelAttributeTypeObject //模型
-)
-
-const (
 	modelAttributeTypeString = "String" //String类型
 	modelAttributeTypeInt    = "Int"    //Int类型
 	modelAttributeTypeFloat  = "Float"  //浮点数

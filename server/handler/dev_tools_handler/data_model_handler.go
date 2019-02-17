@@ -5,7 +5,6 @@ import (
 	"fmt"
 	"go-eladmin/common"
 	"go-eladmin/model"
-	"go-eladmin/model/model_app"
 	"go-eladmin/model/model_app_data_model"
 	"go-eladmin/model/model_dev_tools/model_data_model"
 	"go-eladmin/server/handler/check_permission"
@@ -251,7 +250,7 @@ func listHandler(c *gin.Context) {
 		c.Set(common.KeyContextResponse, aRes)
 		c.JSON(http.StatusOK, aRes)
 	}()
-	if check_permission.CheckNoPermission(c, model_app.ApplicationPermissionSelect) {
+	if check_permission.CheckNoPermission(c, model_data_model.DataModelPermissionCreate) {
 		log4go.Info(handler_common.RequestId(c) + "has no permission")
 		aRes.SetErrorInfo(http.StatusBadRequest, "has no permission")
 		return
