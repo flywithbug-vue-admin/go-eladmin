@@ -17,10 +17,12 @@ const (
 )
 
 type AppDataModel struct {
-	Id         int64 `json:"id,omitempty" bson:"_id,omitempty"`
-	ModelId    int64 `json:"model_id,omitempty" bson:"model_id,omitempty"`
-	AppId      int64 `json:"app_id,omitempty" bson:"app_id,omitempty"`
-	CreateTime int64 `json:"create_time,omitempty" bson:"create_time,omitempty"`
+	Id             int64 `json:"id,omitempty" bson:"_id,omitempty"`
+	ModelId        int64 `json:"model_id,omitempty" bson:"model_id,omitempty"`
+	AppId          int64 `json:"app_id,omitempty" bson:"app_id,omitempty"`
+	StartVersionId int64 `json:"start_version_id,omitempty" bson:"start_version_id,omitempty"`
+	EndVersionId   int64 `json:"end_version_id,omitempty" bson:"end_version_id,omitempty"`
+	CreateTime     int64 `json:"create_time,omitempty" bson:"create_time,omitempty"`
 }
 
 func (a AppDataModel) ToJson() string {

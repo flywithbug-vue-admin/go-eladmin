@@ -66,6 +66,9 @@ type Attribute struct {
 	Comments  string `json:"comments,omitempty" bson:"comments,omitempty"` //属性说明
 }
 
+/*
+TODO 历史版本记录
+*/
 type DataModel struct {
 	Id         int64                   `json:"id,omitempty" bson:"_id,omitempty"`
 	Name       string                  `json:"name,omitempty" bson:"name,omitempty"` //过滤中文名
@@ -75,7 +78,7 @@ type DataModel struct {
 	Attributes []Attribute             `json:"attributes,omitempty" bson:"attributes,omitempty"` //模型的属性表
 	Apps       []model_app.Application `json:"apps,omitempty" bson:"apps,omitempty"`             //不存入数据库
 	Owner      model_user.User         `json:"owner,omitempty" bson:"owner,omitempty"`           //模型负责人（初始为创建人）
-	ParentId   int64                   `json:"parent_id,omitempty" bson:"parent_id,omitempty"`
+	ParentId   int64                   `json:"parentId,omitempty" bson:"parentId,omitempty"`
 	Parent     interface{}             `json:"parent,omitempty" bson:"parent,omitempty"`
 }
 

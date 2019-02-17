@@ -261,6 +261,8 @@ func listHandler(c *gin.Context) {
 	sort := c.Query("sort")
 	name := c.Query("name")
 	appId, _ := strconv.ParseInt(c.Query("appId"), 10, 64)
+	exc := c.Query("exc")
+
 	if strings.EqualFold(sort, "-id") {
 		sort = "-_id"
 	} else if strings.EqualFold(sort, "+id") {
@@ -283,6 +285,16 @@ func listHandler(c *gin.Context) {
 	if len(name) > 0 {
 		query["name"] = bson.M{"$regex": name, "$options": "i"}
 	}
+
+	if len(exc) > 0 {
+		excepts := strings.Split(exc, ",")
+		ids := make([]int64, len(excepts))
+		for index, item := range excepts {
+			ids[index], _ = strconv.ParseInt(item, 10, 64)
+		}
+		query["_id"] = bson.M{"$nin": ids}
+	}
+
 	if appId > 0 {
 		am := model_app_data_model.AppDataModel{}
 		totalCount, _ := am.TotalCount(bson.M{"app_id": appId}, nil)
