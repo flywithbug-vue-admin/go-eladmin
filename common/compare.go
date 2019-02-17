@@ -1,7 +1,7 @@
 package common
 
 import (
-	"errors"
+	"fmt"
 	"regexp"
 	"strconv"
 	"strings"
@@ -20,50 +20,41 @@ var versionRe = regexp.MustCompile(`[\d.]`)
 
 //版本号规则xx.xx.xx 只能有数字和点 version1
 func VersionCompare(version1, version2 string) (CompareState, error) {
-	if len(version2) == 0 {
-		version2 = "0"
+	vNum1 := transformVersionToInt(version1)
+	if vNum1 == -1 {
+		return CompareVersionStateFailed, fmt.Errorf("%s not right (note: x.x.x or x.x.x.x)", version1)
 	}
-	if len(version1) == 0 {
-		version1 = "0"
+	vNum2 := transformVersionToInt(version2)
+	if vNum2 == -1 {
+		return CompareVersionStateFailed, fmt.Errorf("%s not right (note: x.x.x or x.x.x.x)", version2)
 	}
-	if !checkVersionOK(version1) || !checkVersionOK(version2) {
-		return CompareVersionStateFailed, errors.New("version string not ok")
-	}
-	length1 := len(version1)
-	length2 := len(version2)
-	min := length1
-	if min > length2 {
-		min = length2
-	}
-	versionN1, _ := strconv.Atoi(strings.Replace(version1[0:min], ".", "", -1))
-	versionN2, _ := strconv.Atoi(strings.Replace(version2[0:min], ".", "", -1))
-
-	if versionN1 > versionN2 {
+	if vNum1 > vNum2 {
 		return CompareVersionStateGreater, nil
-	} else if versionN1 < versionN2 {
+	} else if vNum1 < vNum2 {
 		return CompareVersionStateLess, nil
-	}
-	if length1 == length2 {
-		return CompareVersionStateEqual, nil
-	} else if length1 > length2 {
-		return CompareVersionStateGreater, nil
 	} else {
 		return CompareVersionStateLess, nil
 	}
-	return CompareVersionStateFailed, nil
 }
 
-func checkVersionOK(version string) bool {
-	if strings.HasPrefix(version, ".") || strings.HasSuffix(version, ".") {
-		return false
+func transformVersionToInt(version string) int {
+	list := strings.Split(version, ".")
+	if len(list) > 4 {
+		return -1
 	}
-	if strings.Contains(version, "..") {
-		return false
+	total := 0
+	versions := []int{0, 0, 0, 0}
+	for index := range list {
+		num, err := strconv.Atoi(list[index])
+		if err != nil {
+			return -1
+		}
+		if num > 255 {
+			return -1
+		}
+		versions[index] = num
 	}
-	str := strings.Replace(version, ".", "", -1)
-	_, err := strconv.Atoi(str)
-	if err != nil {
-		return false
-	}
-	return true
+	total = versions[0]<<24 | versions[1]<<16 | versions[2]<<8 | versions[3]<<1
+	return total
+
 }

@@ -62,9 +62,10 @@ func (app AppVersion) checkAppVersionTime() error {
 		if app.LockTime > app.GrayTime {
 			return fmt.Errorf("锁版时间不能晚于灰度时间")
 		}
-		if app.GrayTime > app.ReleaseTime {
+		if app.ReleaseTime > 0 && app.GrayTime > app.ReleaseTime {
 			return fmt.Errorf("灰度时间不能晚于发布时间")
 		}
+		return nil
 	}
 	a, err := app.FindOne()
 	if err != nil {
@@ -150,15 +151,14 @@ func (app *AppVersion) Insert() error {
 	if err != nil {
 		return err
 	}
-
 	var application = Application{}
-
 	if !application.isExist(bson.M{"_id": app.AppId}) {
 		return fmt.Errorf("appID:%d not found", app.AppId)
 	}
 	if app.isExist(bson.M{"version": app.Version, "app_id": app.AppId}) {
 		return fmt.Errorf("version exist")
 	}
+
 	if len(app.ParentVersion) > 0 {
 		if !app.isExist(bson.M{"version": app.ParentVersion, "app_id": app.AppId}) {
 			return errors.New("parent_version not exist")

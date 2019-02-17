@@ -38,13 +38,14 @@ func addAppVersionHandler(c *gin.Context) {
 		return
 	}
 	c.Set(common.KeyContextPara, para.ToJson())
-
 	err = para.Insert()
+
 	if err != nil {
 		log4go.Info(handler_common.RequestId(c) + err.Error())
 		aRes.SetErrorInfo(http.StatusInternalServerError, "para invalid: "+err.Error())
 		return
 	}
+
 	aRes.AddResponseInfo("app", para)
 }
 
@@ -99,7 +100,7 @@ func getAppVersionListHandler(c *gin.Context) {
 	limit, _ := strconv.Atoi(c.Query("size"))
 	page, _ := strconv.Atoi(c.Query("page"))
 	sort := c.Query("sort")
-
+	version := c.Query("version")
 	if strings.EqualFold(sort, "-id") {
 		sort = "-_id"
 	} else if strings.EqualFold(sort, "+id") {
@@ -123,6 +124,11 @@ func getAppVersionListHandler(c *gin.Context) {
 	if appId > 0 {
 		query = bson.M{"app_id": appId}
 	}
+
+	if len(version) > 0 {
+		query["version"] = bson.M{"$gte": version}
+	}
+
 	var appV = model_app.AppVersion{}
 	totalCount, _ := appV.TotalCount(query, nil)
 	appList, err := appV.FindPageFilter(page, limit, query, nil, sort)

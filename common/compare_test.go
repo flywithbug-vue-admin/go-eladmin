@@ -43,3 +43,8 @@ func TestVersionCompare(t *testing.T) {
 	//fmt.Println(checkVersionOK(".1.1.1"))
 
 }
+
+func TestVersionCompare2(t *testing.T) {
+	num := transformVersionToInt("1.256.1.1")
+	fmt.Println(num)
+}

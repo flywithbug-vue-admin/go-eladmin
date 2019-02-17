@@ -83,8 +83,21 @@ func modeifyAppModelHandler(c *gin.Context) {
 		return
 	}
 
-	if para.Exist(bson.M{"app_id": para.AppId}) {
-
+	if len(para.EndVersion) != 0 && para.StartVersion > para.EndVersion {
+		msg := fmt.Sprintf("startVersion is small than endVersion")
+		log4go.Info(handler_common.RequestId(c) + msg)
+		aRes.SetErrorInfo(http.StatusBadRequest, msg)
+		return
 	}
 
+	if !para.Exist(bson.M{"app_id": para.AppId, "model_id": para.ModelId}) {
+		err = para.Insert()
+		if err != nil {
+			log4go.Info(handler_common.RequestId(c) + err.Error())
+			aRes.SetErrorInfo(http.StatusInternalServerError, "server invalid: "+err.Error())
+			return
+		}
+	} else {
+
+	}
 }
