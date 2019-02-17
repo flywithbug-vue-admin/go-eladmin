@@ -137,6 +137,11 @@ func getAppVersionListHandler(c *gin.Context) {
 		aRes.SetErrorInfo(http.StatusUnauthorized, "app version list find error"+err.Error())
 		return
 	}
+	for _, appV := range appList {
+		appV.VersionNum = common.TransformVersionToInt(appV.Version)
+		appV.Update()
+	}
+
 	aRes.AddResponseInfo("list", appList)
 	aRes.AddResponseInfo("total", totalCount)
 }

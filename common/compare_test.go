@@ -45,6 +45,6 @@ func TestVersionCompare(t *testing.T) {
 }
 
 func TestVersionCompare2(t *testing.T) {
-	num := transformVersionToInt("1.256.1.1")
+	num := TransformVersionToInt("255.0.1.1")
 	fmt.Println(num)
 }

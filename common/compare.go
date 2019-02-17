@@ -20,11 +20,11 @@ var versionRe = regexp.MustCompile(`[\d.]`)
 
 //版本号规则xx.xx.xx 只能有数字和点 version1
 func VersionCompare(version1, version2 string) (CompareState, error) {
-	vNum1 := transformVersionToInt(version1)
+	vNum1 := TransformVersionToInt(version1)
 	if vNum1 == -1 {
 		return CompareVersionStateFailed, fmt.Errorf("%s not right (note: x.x.x or x.x.x.x)", version1)
 	}
-	vNum2 := transformVersionToInt(version2)
+	vNum2 := TransformVersionToInt(version2)
 	if vNum2 == -1 {
 		return CompareVersionStateFailed, fmt.Errorf("%s not right (note: x.x.x or x.x.x.x)", version2)
 	}
@@ -37,7 +37,7 @@ func VersionCompare(version1, version2 string) (CompareState, error) {
 	}
 }
 
-func transformVersionToInt(version string) int {
+func TransformVersionToInt(version string) int {
 	list := strings.Split(version, ".")
 	if len(list) > 4 {
 		return -1
@@ -56,5 +56,4 @@ func transformVersionToInt(version string) int {
 	}
 	total = versions[0]<<24 | versions[1]<<16 | versions[2]<<8 | versions[3]<<1
 	return total
-
 }

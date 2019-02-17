@@ -37,6 +37,7 @@ type AppVersion struct {
 	AppId         int64      `json:"app_id,omitempty" bson:"app_id,omitempty"` //所属App DB Id
 	Version       string     `json:"version,omitempty" bson:"version,omitempty"`
 	ParentVersion string     `json:"parent_version,omitempty" bson:"parent_version,omitempty"`
+	VersionNum    int        `json:"version_num,omitempty" bson:"version_num,omitempty"`
 	Platform      []string   `json:"platform,omitempty" bson:"platform,omitempty"`           //(iOS,Android,H5,Server)["iOS","Android","H5","Server"]
 	Status        typeStatus `json:"status,omitempty" bson:"status,omitempty"`               //状态    1(准备中) 2(开发中) 3(灰度) 4(已发布)
 	ApprovalTime  int64      `json:"approval_time,omitempty" bson:"approval_time,omitempty"` //立项时间
@@ -191,6 +192,7 @@ func (app *AppVersion) Insert() error {
 	if len(app.ParentVersion) == 0 {
 		app.ParentVersion = "-"
 	}
+
 	return app.insert(app)
 }
 
