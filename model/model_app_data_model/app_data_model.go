@@ -22,8 +22,8 @@ type AppDataModel struct {
 	Id           int64  `json:"id,omitempty" bson:"_id,omitempty"`
 	ModelId      int64  `json:"model_id,omitempty" bson:"model_id,omitempty"`
 	AppId        int64  `json:"app_id,omitempty" bson:"app_id,omitempty"`
-	StartVersion string `json:"start_version_id,omitempty" bson:"start_version_id,omitempty"`
-	EndVersion   string `json:"end_version_id,omitempty" bson:"end_version_id,omitempty"`
+	StartVersion string `json:"start_version,omitempty" bson:"start_version,omitempty"`
+	EndVersion   string `json:"end_version,omitempty" bson:"end_version,omitempty"`
 	StartVNum    int    `json:"start_v_num,omitempty" bson:"start_v_num,omitempty"`
 	EndVNum      int    `json:"end_v_num,omitempty" bson:"end_v_num,omitempty"`
 	CreateTime   int64  `json:"create_time,omitempty" bson:"create_time,omitempty"`

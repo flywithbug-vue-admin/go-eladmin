@@ -60,4 +60,10 @@ var Routers = []handler_common.GinHandleFunc{
 		Method:     "PUT",
 		Route:      "/app/version",
 	},
+	{
+		Handler:    queryAppVersion,
+		RouterType: handler_common.RouterTypeNeedAuth,
+		Method:     "GET",
+		Route:      "/app/version",
+	},
 }

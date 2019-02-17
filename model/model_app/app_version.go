@@ -147,6 +147,11 @@ func (app AppVersion) FindOne() (AppVersion, error) {
 	return app, err
 }
 
+func (app AppVersion) FindAll(query, selector interface{}) ([]AppVersion, error) {
+	results, err := app.findAll(query, selector)
+	return results, err
+}
+
 func (app *AppVersion) Insert() error {
 	err := app.checkTimeValid()
 	if err != nil {

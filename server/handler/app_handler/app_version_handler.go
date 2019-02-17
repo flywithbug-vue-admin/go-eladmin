@@ -95,7 +95,6 @@ func getAppVersionListHandler(c *gin.Context) {
 		aRes.SetErrorInfo(http.StatusBadRequest, "has no permission")
 		return
 	}
-
 	appId, _ := strconv.Atoi(c.Query("app_id"))
 	limit, _ := strconv.Atoi(c.Query("size"))
 	page, _ := strconv.Atoi(c.Query("page"))
@@ -126,7 +125,15 @@ func getAppVersionListHandler(c *gin.Context) {
 	}
 
 	if len(version) > 0 {
-		query["version"] = bson.M{"$gte": version}
+		vNum := common.TransformVersionToInt(version)
+		if vNum == -1 {
+			msg := fmt.Sprintf("version:%s not right  (note: x.x.x or x.x.x.x)", version)
+			log4go.Info(handler_common.RequestId(c) + msg)
+			aRes.SetErrorInfo(http.StatusBadRequest, msg)
+			return
+		}
+		log4go.Info("version:%s,VNum:%d", version, vNum)
+		query["version_num"] = bson.M{"$gte": vNum}
 	}
 
 	var appV = model_app.AppVersion{}
@@ -134,7 +141,7 @@ func getAppVersionListHandler(c *gin.Context) {
 	appList, err := appV.FindPageFilter(page, limit, query, nil, sort)
 	if err != nil {
 		log4go.Info(handler_common.RequestId(c) + err.Error())
-		aRes.SetErrorInfo(http.StatusUnauthorized, "app version list find error"+err.Error())
+		aRes.SetErrorInfo(http.StatusBadRequest, "app version list find error"+err.Error())
 		return
 	}
 	aRes.AddResponseInfo("list", appList)
@@ -172,4 +179,32 @@ func removeAppVersionHandler(c *gin.Context) {
 		return
 	}
 	aRes.SetSuccess()
+}
+
+func queryAppVersion(c *gin.Context) {
+	aRes := model.NewResponse()
+	defer func() {
+		c.Set(common.KeyContextResponse, aRes)
+		c.JSON(http.StatusOK, aRes)
+	}()
+	if check_permission.CheckNoPermission(c, model_app.ApplicationPermissionSelect) {
+		log4go.Info(handler_common.RequestId(c) + "has no permission")
+		aRes.SetErrorInfo(http.StatusBadRequest, "has no permission")
+		return
+	}
+	query := bson.M{}
+	version := c.Query("version")
+	appId, _ := strconv.Atoi(c.Query("app_id"))
+	query = bson.M{"app_id": appId}
+	if len(version) > 0 {
+		query["version"] = bson.M{"$regex": version, "$options": "i"}
+	}
+	var appV = model_app.AppVersion{}
+	appList, err := appV.FindAll(query, nil)
+	if err != nil {
+		log4go.Info(handler_common.RequestId(c) + err.Error())
+		aRes.SetErrorInfo(http.StatusUnauthorized, "app version list find error"+err.Error())
+		return
+	}
+	aRes.AddResponseInfo("list", appList)
 }
