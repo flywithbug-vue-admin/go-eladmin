@@ -160,7 +160,7 @@ func (app *AppVersion) Insert() error {
 		return fmt.Errorf("version exist")
 	}
 
-	if len(app.ParentVersion) > 0 {
+	if len(app.ParentVersion) > 0 && !strings.EqualFold(app.ParentVersion, "-") {
 		if !app.isExist(bson.M{"version": app.ParentVersion, "app_id": app.AppId}) {
 			return errors.New("parent_version not exist")
 		}
@@ -225,6 +225,9 @@ func (app AppVersion) Remove() error {
 }
 
 func (app AppVersion) Update() error {
+	if app.ParentVersion == "-" {
+		app.ParentVersion = ""
+	}
 	if err := app.checkTimeValid(); err != nil {
 		return err
 	}
@@ -239,6 +242,7 @@ func (app AppVersion) Update() error {
 	if app.Status < appOld.Status {
 		app.Status = appOld.Status
 	}
+
 	selector := bson.M{"_id": app.Id}
 	if app.Status > 1 {
 		//状态大于1时，可以更新锁版时间，灰度时间，状态，和发布时间
@@ -284,6 +288,7 @@ func (app AppVersion) Update() error {
 				return fmt.Errorf("platform must like (iOS,Android,H5,Server) ")
 			}
 		}
+
 		compareState, err := common.VersionCompare(app.Version, app.ParentVersion)
 		if err != nil {
 			return err

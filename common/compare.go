@@ -38,6 +38,9 @@ func VersionCompare(version1, version2 string) (CompareState, error) {
 }
 
 func TransformVersionToInt(version string) int {
+	if len(version) == 0 {
+		return 0
+	}
 	list := strings.Split(version, ".")
 	if len(list) > 4 {
 		return -1
