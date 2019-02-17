@@ -29,11 +29,11 @@ const (
 )
 
 const (
-	DataModelPermissionALL    = "Data_Model_ALL"
-	DataModelPermissionCreate = "Data_Model_CREATE"
-	DataModelPermissionSelect = "Data_Model_SELECT"
-	DataModelPermissionEdit   = "Data_Model_EDIT"
-	DataModelPermissionDelete = "Data_Model_DELETE"
+	DataModelPermissionALL    = "Model_ALL"
+	DataModelPermissionCreate = "Model_CREATE"
+	DataModelPermissionSelect = "Model_SELECT"
+	DataModelPermissionEdit   = "Model_EDIT"
+	DataModelPermissionDelete = "Model_DELETE"
 )
 
 var (

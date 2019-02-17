@@ -2,6 +2,7 @@ package model_app_data_model
 
 import (
 	"encoding/json"
+	"go-eladmin/common"
 	"go-eladmin/core/mongo"
 	"go-eladmin/model/a_mongo_index"
 	"go-eladmin/model/shareDB"
@@ -14,6 +15,7 @@ import (
 
 const (
 	AppDataModelCollection = mongo_index.CollectionAppDataModel
+	MaxVersion             = 4294967294
 )
 
 type AppDataModel struct {
@@ -22,6 +24,8 @@ type AppDataModel struct {
 	AppId        int64  `json:"app_id,omitempty" bson:"app_id,omitempty"`
 	StartVersion string `json:"start_version_id,omitempty" bson:"start_version_id,omitempty"`
 	EndVersion   string `json:"end_version_id,omitempty" bson:"end_version_id,omitempty"`
+	StartVNum    int    `json:"start_v_num,omitempty" bson:"start_v_num,omitempty"`
+	EndVNum      int    `json:"end_v_num,omitempty" bson:"end_v_num,omitempty"`
 	CreateTime   int64  `json:"create_time,omitempty" bson:"create_time,omitempty"`
 }
 
@@ -97,10 +101,30 @@ func (a AppDataModel) Exist(query interface{}) bool {
 func (a AppDataModel) Insert() error {
 	a.Id, _ = mongo.GetIncrementId(shareDB.DocManagerDBName(), AppDataModelCollection)
 	a.CreateTime = time.Now().Unix()
+	if len(a.EndVersion) == 0 {
+		a.EndVNum = MaxVersion
+	} else {
+		a.EndVNum = common.TransformVersionToInt(a.EndVersion)
+	}
+	if len(a.StartVersion) == 0 {
+		a.StartVNum = 0
+	} else {
+		a.StartVNum = common.TransformVersionToInt(a.StartVersion)
+	}
 	return a.insert(a)
 }
 
 func (a AppDataModel) Update() error {
+	if len(a.EndVersion) == 0 {
+		a.EndVNum = MaxVersion
+	} else {
+		a.EndVNum = common.TransformVersionToInt(a.EndVersion)
+	}
+	if len(a.StartVersion) == 0 {
+		a.StartVNum = 0
+	} else {
+		a.StartVNum = common.TransformVersionToInt(a.StartVersion)
+	}
 	return a.update(bson.M{"_id": a.Id}, a)
 }
 

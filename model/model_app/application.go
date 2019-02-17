@@ -207,6 +207,17 @@ func (a Application) FindOne(query, selector interface{}) (Application, error) {
 	return a, nil
 }
 
+func (a Application) FindSimpleOne(query, selector interface{}) (Application, error) {
+	if query == nil {
+		query = bson.M{"_id": a.Id}
+	}
+	a, err := a.findOne(query, selector)
+	if err != nil {
+		return a, err
+	}
+	return a, nil
+}
+
 func (a Application) FindAll(query, selector interface{}) (apps []Application, err error) {
 	apps, err = a.findAll(query, selector)
 	makeTreeApplication(apps)
