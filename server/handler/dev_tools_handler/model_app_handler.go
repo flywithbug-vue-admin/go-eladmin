@@ -18,8 +18,9 @@ import (
 )
 
 type paraModel struct {
-	Model model_app_data_model.AppDataModel `json:"model"`
-	App   model_app.Application             `json:"app"`
+	Model  model_app_data_model.AppDataModel `json:"model"`
+	App    model_app.Application             `json:"app"`
+	Option string                            `json:"option"`
 }
 
 func updateApplicationRelationHandler(c *gin.Context) {
@@ -74,44 +75,44 @@ func modeifyAppModelHandler(c *gin.Context) {
 		return
 	}
 	c.Set(common.KeyContextPara, para.ToJson())
+	if para.Id == 0 {
+		msg := fmt.Sprintf("id is 0")
+		log4go.Info(handler_common.RequestId(c) + msg)
+		aRes.SetErrorInfo(http.StatusBadRequest, "para invalid:"+msg)
+		return
+	}
+
 	dm := model_data_model.DataModel{}
-	if !dm.Exist(bson.M{"_id": para.ModelId}) {
-		msg := fmt.Sprintf("para invalid: modelId:%d not exist", para.ModelId)
-		log4go.Info(handler_common.RequestId(c) + msg)
-		aRes.SetErrorInfo(http.StatusBadRequest, msg)
-		return
-	}
-	app := model_app.Application{}
-	if !app.Exist(bson.M{"_id": para.AppId}) {
-		msg := fmt.Sprintf("para invalid: appId:%d not exist", para.AppId)
-		log4go.Info(handler_common.RequestId(c) + msg)
-		aRes.SetErrorInfo(http.StatusBadRequest, msg)
-		return
-	}
-
-	if len(para.EndVersion) != 0 && para.StartVersion > para.EndVersion {
-		msg := fmt.Sprintf("startVersion is small than endVersion")
-		log4go.Info(handler_common.RequestId(c) + msg)
-		aRes.SetErrorInfo(http.StatusBadRequest, msg)
-		return
-	}
-
-	if !para.Exist(bson.M{"app_id": para.AppId, "model_id": para.ModelId}) {
-		err = para.Insert()
-		if err != nil {
-			log4go.Info(handler_common.RequestId(c) + err.Error())
-			aRes.SetErrorInfo(http.StatusInternalServerError, "server invalid: "+err.Error())
+	if para.ModelId > 0 {
+		if !dm.Exist(bson.M{"_id": para.ModelId}) {
+			msg := fmt.Sprintf("para invalid: modelId:%d not exist", para.ModelId)
+			log4go.Info(handler_common.RequestId(c) + msg)
+			aRes.SetErrorInfo(http.StatusBadRequest, msg)
 			return
 		}
-	} else {
-
 	}
+	if para.AppId > 0 {
+		app := model_app.Application{}
+		if !app.Exist(bson.M{"_id": para.AppId}) {
+			msg := fmt.Sprintf("para invalid: appId:%d not exist", para.AppId)
+			log4go.Info(handler_common.RequestId(c) + msg)
+			aRes.SetErrorInfo(http.StatusBadRequest, msg)
+			return
+		}
+	}
+	err = para.Update()
+	if err != nil {
+		log4go.Error(handler_common.RequestId(c) + err.Error())
+		aRes.SetErrorInfo(http.StatusBadRequest, "model find error"+err.Error())
+		return
+	}
+	aRes.SetSuccess()
 }
 
 /**
 模型关联的App数据获取
 */
-func modelRelationAppListHandler(c *gin.Context) {
+func getModelRelationAppListHandler(c *gin.Context) {
 	aRes := model.NewResponse()
 	defer func() {
 		c.Set(common.KeyContextResponse, aRes)
@@ -191,4 +192,8 @@ func appRelationModelListHandler(c *gin.Context) {
 	//}
 	//
 	//aRes.AddResponseInfo("list", results)
+}
+
+func updateAppModelRelationHandler(c *gin.Context) {
+
 }

@@ -2,6 +2,7 @@ package model_app_data_model
 
 import (
 	"encoding/json"
+	"fmt"
 	"go-eladmin/common"
 	"go-eladmin/core/mongo"
 	"go-eladmin/model/a_mongo_index"
@@ -115,15 +116,16 @@ func (a AppDataModel) Insert() error {
 }
 
 func (a AppDataModel) Update() error {
-	if len(a.EndVersion) == 0 {
-		a.EndVNum = MaxVersion
-	} else {
-		a.EndVNum = common.TransformVersionToInt(a.EndVersion)
+	vNum := common.TransformVersionToInt(a.StartVersion)
+	if vNum > 0 {
+		a.StartVNum = vNum
 	}
-	if len(a.StartVersion) == 0 {
-		a.StartVNum = 0
-	} else {
-		a.StartVNum = common.TransformVersionToInt(a.StartVersion)
+	vNum = common.TransformVersionToInt(a.EndVersion)
+	if vNum > 0 {
+		a.EndVNum = vNum
+	}
+	if a.EndVNum < a.StartVNum {
+		return fmt.Errorf("startVersion:%s, bigger than endVersion:%s", a.StartVersion, a.EndVersion)
 	}
 	return a.update(bson.M{"_id": a.Id}, a)
 }

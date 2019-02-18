@@ -46,9 +46,15 @@ var Routers = []handler_common.GinHandleFunc{
 		Route:      "/tools/model/list",
 	},
 	{
-		Handler:    modelRelationAppListHandler, //获取模型数据
+		Handler:    getModelRelationAppListHandler, //获取模型数据
 		RouterType: handler_common.RouterTypeNeedAuth,
 		Method:     "GET",
+		Route:      "/tools/model_apps",
+	},
+	{
+		Handler:    modeifyAppModelHandler, //获取模型数据
+		RouterType: handler_common.RouterTypeNeedAuth,
+		Method:     "PUT",
 		Route:      "/tools/model_apps",
 	},
 }
