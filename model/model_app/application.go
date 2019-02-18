@@ -37,7 +37,7 @@ type Application struct {
 	OwnerId    int64             `json:"owner_id,omitempty" bson:"owner_id,omitempty"`
 	BundleId   string            `json:"bundle_id,omitempty" bson:"bundle_id,omitempty"`
 	Managers   []model_user.User `json:"managers,omitempty" bson:"managers,omitempty"` //管理员
-	Disable    bool              `json:"disable" bson:"disable,omitempty"`
+	Disabled   bool              `json:"disabled" bson:"disabled,omitempty"`
 }
 
 func (a Application) ToJson() string {
