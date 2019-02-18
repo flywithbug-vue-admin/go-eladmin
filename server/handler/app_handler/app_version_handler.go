@@ -127,12 +127,8 @@ func getAppVersionListHandler(c *gin.Context) {
 	if len(version) > 0 {
 		vNum := common.TransformVersionToInt(version)
 		if vNum == -1 {
-			msg := fmt.Sprintf("version:%s not right  (note: x.x.x or x.x.x.x)", version)
-			log4go.Info(handler_common.RequestId(c) + msg)
-			aRes.SetErrorInfo(http.StatusBadRequest, msg)
 			return
 		}
-		log4go.Info("version:%s,VNum:%d", version, vNum)
 		query["version_num"] = bson.M{"$gte": vNum}
 	}
 
