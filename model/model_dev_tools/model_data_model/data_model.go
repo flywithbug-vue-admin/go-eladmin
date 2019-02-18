@@ -51,7 +51,7 @@ type Attribute struct {
 	ModelName string `json:"model_name,omitempty" bson:"model_name,omitempty"`
 	ModelId   int64  `json:"model_id,omitempty" bson:"model_id,omitempty"`
 	Default   string `json:"default,omitempty" bson:"default,omitempty"`   //默认值
-	Required  bool   `json:"required,omitempty" bson:"required,omitempty"` //是否必填 RequestPara 使用
+	Required  bool   `json:"required" bson:"required,omitempty"`           //是否必填 RequestPara 使用
 	Comments  string `json:"comments,omitempty" bson:"comments,omitempty"` //属性说明
 }
 
@@ -380,7 +380,6 @@ func fetchOwnerAndAttributes(result []DataModel) error {
 			}
 			result[index].Owner = user
 		}
-
 		for index1 := range result[index].Attributes {
 			if result[index].Attributes[index1].ModelId > 0 {
 				dm := DataModel{}
