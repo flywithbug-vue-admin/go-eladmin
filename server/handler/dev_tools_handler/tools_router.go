@@ -45,6 +45,8 @@ var Routers = []handler_common.GinHandleFunc{
 		Method:     "GET",
 		Route:      "/tools/model/list",
 	},
+
+	//model App relation
 	{
 		Handler:    getModelRelationAppListHandler, //获取模型数据
 		RouterType: handler_common.RouterTypeNeedAuth,
@@ -52,9 +54,21 @@ var Routers = []handler_common.GinHandleFunc{
 		Route:      "/tools/model_apps",
 	},
 	{
-		Handler:    modeifyAppModelHandler, //获取模型数据
+		Handler:    modifyAppModelVersionHandler, //修改模型App version 起止版本
 		RouterType: handler_common.RouterTypeNeedAuth,
 		Method:     "PUT",
-		Route:      "/tools/model_apps",
+		Route:      "/tools/model_app/version",
+	},
+	{
+		Handler:    removeAppModelRelationHandler, //修改模型App version 起止版本
+		RouterType: handler_common.RouterTypeNeedAuth,
+		Method:     "DELETE",
+		Route:      "/tools/model_app",
+	},
+	{
+		Handler:    addAppModelRelationHandler, //修改模型App version 起止版本
+		RouterType: handler_common.RouterTypeNeedAuth,
+		Method:     "POST",
+		Route:      "/tools/model_app",
 	},
 }

@@ -18,9 +18,10 @@ import (
 )
 
 type paraModel struct {
-	Model  model_app_data_model.AppDataModel `json:"model"`
-	App    model_app.Application             `json:"app"`
-	Option string                            `json:"option"`
+	Model     model_app_data_model.AppDataModel `json:"model"`
+	App       model_app.Application             `json:"app"`
+	Option    string                            `json:"option"`
+	PopStatus bool                              `json:"pop_status"`
 }
 
 func updateApplicationRelationHandler(c *gin.Context) {
@@ -56,7 +57,7 @@ func updateApplicationRelationHandler(c *gin.Context) {
 	aRes.SetSuccess()
 }
 
-func modeifyAppModelHandler(c *gin.Context) {
+func modifyAppModelVersionHandler(c *gin.Context) {
 	aRes := model.NewResponse()
 	defer func() {
 		c.Set(common.KeyContextResponse, aRes)
@@ -100,10 +101,24 @@ func modeifyAppModelHandler(c *gin.Context) {
 			return
 		}
 	}
+	oldDM, err := para.FindOne(bson.M{"_id": para.Id}, nil)
+	if err != nil {
+		if err != nil {
+			log4go.Error(handler_common.RequestId(c) + err.Error())
+			aRes.SetErrorInfo(http.StatusBadRequest, "model find error:"+err.Error())
+			return
+		}
+	}
+	if len(para.StartVersion) == 0 {
+		para.StartVersion = oldDM.StartVersion
+	}
+	if len(para.EndVersion) == 0 {
+		para.EndVersion = oldDM.EndVersion
+	}
 	err = para.Update()
 	if err != nil {
 		log4go.Error(handler_common.RequestId(c) + err.Error())
-		aRes.SetErrorInfo(http.StatusBadRequest, "model find error"+err.Error())
+		aRes.SetErrorInfo(http.StatusBadRequest, "model update error"+err.Error())
 		return
 	}
 	aRes.SetSuccess()
@@ -195,5 +210,80 @@ func appRelationModelListHandler(c *gin.Context) {
 }
 
 func updateAppModelRelationHandler(c *gin.Context) {
+
+}
+
+func removeAppModelRelationHandler(c *gin.Context) {
+	aRes := model.NewResponse()
+	defer func() {
+		c.Set(common.KeyContextResponse, aRes)
+		c.JSON(http.StatusOK, aRes)
+	}()
+	if check_permission.CheckNoPermission(c, model_data_model.DataModelPermissionEdit) {
+		log4go.Info(handler_common.RequestId(c) + "has no permission")
+		aRes.SetErrorInfo(http.StatusBadRequest, "has no permission")
+		return
+	}
+	para := new(model_app_data_model.AppDataModel)
+	err := c.BindJSON(para)
+	if err != nil {
+		log4go.Info(handler_common.RequestId(c) + err.Error())
+		aRes.SetErrorInfo(http.StatusBadRequest, "para invalid"+err.Error())
+		return
+	}
+	c.Set(common.KeyContextPara, para.ToJson())
+	if para.Id == 0 {
+		msg := fmt.Sprintf("id is 0")
+		log4go.Info(handler_common.RequestId(c) + msg)
+		aRes.SetErrorInfo(http.StatusBadRequest, "para invalid:"+msg)
+		return
+	}
+	err = para.Remove()
+	if err != nil {
+		log4go.Error(handler_common.RequestId(c) + err.Error())
+		aRes.SetErrorInfo(http.StatusBadRequest, "model delete error"+err.Error())
+		return
+	}
+	aRes.SetSuccess()
+}
+
+func addAppModelRelationHandler(c *gin.Context) {
+	aRes := model.NewResponse()
+	defer func() {
+		c.Set(common.KeyContextResponse, aRes)
+		c.JSON(http.StatusOK, aRes)
+	}()
+	if check_permission.CheckNoPermission(c, model_data_model.DataModelPermissionEdit) {
+		log4go.Info(handler_common.RequestId(c) + "has no permission")
+		aRes.SetErrorInfo(http.StatusBadRequest, "has no permission")
+		return
+	}
+	para := new(model_app_data_model.AppDataModel)
+	err := c.BindJSON(para)
+	if err != nil {
+		log4go.Info(handler_common.RequestId(c) + err.Error())
+		aRes.SetErrorInfo(http.StatusBadRequest, "para invalid"+err.Error())
+		return
+	}
+	c.Set(common.KeyContextPara, para.ToJson())
+	if para.ModelId == 0 {
+		msg := fmt.Sprintf("model_id is 0")
+		log4go.Info(handler_common.RequestId(c) + msg)
+		aRes.SetErrorInfo(http.StatusBadRequest, "para invalid:"+msg)
+		return
+	}
+	if para.AppId == 0 {
+		msg := fmt.Sprintf("app_id is 0")
+		log4go.Info(handler_common.RequestId(c) + msg)
+		aRes.SetErrorInfo(http.StatusBadRequest, "para invalid:"+msg)
+		return
+	}
+	err = para.Insert()
+	if err != nil {
+		log4go.Error(handler_common.RequestId(c) + err.Error())
+		aRes.SetErrorInfo(http.StatusBadRequest, "model delete error"+err.Error())
+		return
+	}
+	aRes.SetSuccess()
 
 }

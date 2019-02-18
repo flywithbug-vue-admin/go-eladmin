@@ -23,8 +23,8 @@ type AppDataModel struct {
 	Id           int64  `json:"id,omitempty" bson:"_id,omitempty"`
 	ModelId      int64  `json:"model_id,omitempty" bson:"model_id,omitempty"`
 	AppId        int64  `json:"app_id,omitempty" bson:"app_id,omitempty"`
-	StartVersion string `json:"start_version,omitempty" bson:"start_version,omitempty"`
-	EndVersion   string `json:"end_version,omitempty" bson:"end_version,omitempty"`
+	StartVersion string `json:"start_version" bson:"start_version,omitempty"`
+	EndVersion   string `json:"end_version" bson:"end_version,omitempty"`
 	StartVNum    int    `json:"start_v_num,omitempty" bson:"start_v_num,omitempty"`
 	EndVNum      int    `json:"end_v_num,omitempty" bson:"end_v_num,omitempty"`
 	CreateTime   int64  `json:"create_time,omitempty" bson:"create_time,omitempty"`
@@ -85,8 +85,8 @@ func (a AppDataModel) FindPageFilter(page, limit int, query, selector interface{
 	return
 }
 
-func (a AppDataModel) FindOne(query, selector interface{}) (role AppDataModel, err error) {
-	role, err = a.findOne(query, selector)
+func (a AppDataModel) FindOne(query, selector interface{}) (adm AppDataModel, err error) {
+	adm, err = a.findOne(query, selector)
 	return
 }
 
@@ -124,7 +124,7 @@ func (a AppDataModel) Update() error {
 	if vNum > 0 {
 		a.EndVNum = vNum
 	}
-	if a.EndVNum < a.StartVNum {
+	if a.EndVNum > 0 && a.EndVNum < a.StartVNum {
 		return fmt.Errorf("startVersion:%s, bigger than endVersion:%s", a.StartVersion, a.EndVersion)
 	}
 	return a.update(bson.M{"_id": a.Id}, a)
