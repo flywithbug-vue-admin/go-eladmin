@@ -37,7 +37,7 @@ const (
 )
 
 var (
-	nameReg = regexp.MustCompile(`^[A-Za-z0-9_-]+$`)
+	nameReg = regexp.MustCompile(`^[A-Z][A-Za-z0-9_-]+$`)
 )
 
 const (
@@ -135,7 +135,7 @@ func (d DataModel) Exist(query interface{}) bool {
 }
 
 func (d DataModel) AddAttribute(a Attribute) error {
-	if !checkNameReg(a.Name) {
+	if err := checkNameReg(d.Name); err != nil {
 		return fmt.Errorf("attribute name:%s not right", a.Name)
 	}
 	if d.isExistAttribute(a) {
@@ -154,6 +154,7 @@ func (d DataModel) AddAttribute(a Attribute) error {
 
 func (d DataModel) AddAttributes(list []Attribute) error {
 	for _, item := range list {
+
 		switch item.Type {
 		case modelAttributeTypeString,
 			modelAttributeTypeInt,
@@ -198,12 +199,12 @@ func (d DataModel) AddAttributes(list []Attribute) error {
 	return nil
 }
 
-func checkNameReg(name string) bool {
-	match := nameReg.FindAllString(name, -1)
+func checkNameReg(name string) error {
+	match := nameReg.FindString(name)
 	if len(match) == 0 {
-		return false
+		return fmt.Errorf("attribute name not right:%s (note:^[A-Z][A-Za-z0-9_-]+$)", name)
 	}
-	return true
+	return nil
 }
 
 func (d DataModel) RemoveAttributes(list []Attribute) error {
@@ -298,8 +299,8 @@ func (d DataModel) Insert() (id int64, err error) {
 	if err != nil {
 		return -1, err
 	}
-	if !checkNameReg(d.Name) {
-		return -1, fmt.Errorf("data_model name:%s not right", d.Name)
+	if err = checkNameReg(d.Name); err != nil {
+		return -1, err
 	}
 	d.CreateTime = time.Now().Unix()
 	d.Id = id
@@ -338,8 +339,8 @@ func (d DataModel) UpdateAppRelation() error {
 }
 
 func (d DataModel) Update() error {
-	if len(d.Name) > 0 && !checkNameReg(d.Name) {
-		return fmt.Errorf("data_model name:%s not right", d.Name)
+	if err := checkNameReg(d.Name); err != nil {
+		return err
 	}
 	d.Apps = nil
 	d.Attributes = nil

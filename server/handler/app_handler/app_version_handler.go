@@ -45,7 +45,6 @@ func addAppVersionHandler(c *gin.Context) {
 		aRes.SetErrorInfo(http.StatusInternalServerError, "para invalid: "+err.Error())
 		return
 	}
-
 	aRes.AddResponseInfo("app", para)
 }
 
@@ -102,9 +101,7 @@ func getAppVersionListHandler(c *gin.Context) {
 	version := c.Query("version")
 	if strings.EqualFold(sort, "-id") {
 		sort = "-_id"
-	} else if strings.EqualFold(sort, "+id") {
-		sort = "+_id"
-	} else if len(sort) == 0 {
+	} else {
 		sort = "+_id"
 	}
 	if limit == 0 {
