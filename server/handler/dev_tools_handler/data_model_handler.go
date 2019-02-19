@@ -97,6 +97,7 @@ func modifyAttributeHandler(c *gin.Context) {
 		aRes.SetErrorInfo(http.StatusBadRequest, "para invalid"+err.Error())
 		return
 	}
+	log4go.Info(para.ToJson())
 	c.Set(common.KeyContextPara, para.ToJson())
 	if para.Id == 0 {
 		log4go.Info(handler_common.RequestId(c) + "id is 0")
@@ -105,12 +106,10 @@ func modifyAttributeHandler(c *gin.Context) {
 	}
 	dm := model_data_model.DataModel{}
 	dm.Id = para.Id
-
 	if len(para.DropAttributes) > 0 {
 		dm.RemoveAttributes(para.DropAttributes)
 	}
 	if len(para.Attributes) > 0 {
-		dm.RemoveAttributes(para.Attributes)
 		err = dm.AddAttributes(para.Attributes)
 		if err != nil {
 			log4go.Info(handler_common.RequestId(c) + err.Error())
@@ -118,7 +117,6 @@ func modifyAttributeHandler(c *gin.Context) {
 			return
 		}
 	}
-
 	aRes.SetSuccess()
 }
 

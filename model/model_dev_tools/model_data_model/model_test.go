@@ -62,6 +62,8 @@ func TestPipe(t *testing.T) {
 func TestCheckName(t *testing.T) {
 	result := checkNameReg("abclllalala")
 	fmt.Println(result)
+	result = checkNameReg("Name")
+	fmt.Println(result)
 	result = checkNameReg("Abclllalala")
 	fmt.Println(result)
 	result = checkNameReg("Abcll好的a")

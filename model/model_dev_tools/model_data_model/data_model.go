@@ -36,9 +36,7 @@ const (
 	DataModelPermissionDelete = "Model_DELETE"
 )
 
-var (
-	nameReg = regexp.MustCompile(`^[A-Z][A-Za-z0-9_-]+$`)
-)
+var nameReg = regexp.MustCompile(`^[A-Z][A-Za-z0-9_]+$`)
 
 const (
 	dataModelCollection = mongo_index.CollectionDataModel
@@ -53,6 +51,11 @@ type Attribute struct {
 	Default   string `json:"default,omitempty" bson:"default,omitempty"`   //默认值
 	Required  bool   `json:"required" bson:"required,omitempty"`           //是否必填 RequestPara 使用
 	Comments  string `json:"comments,omitempty" bson:"comments,omitempty"` //属性说明
+}
+
+func (a Attribute) ToJson() string {
+	js, _ := json.Marshal(a)
+	return string(js)
 }
 
 /*
@@ -135,11 +138,11 @@ func (d DataModel) Exist(query interface{}) bool {
 }
 
 func (d DataModel) AddAttribute(a Attribute) error {
-	if err := checkNameReg(d.Name); err != nil {
-		return fmt.Errorf("attribute name:%s not right", a.Name)
-	}
 	if d.isExistAttribute(a) {
 		return fmt.Errorf("duplicate attribute name:%s", a.Name)
+	}
+	if err := checkNameReg(a.Name); err != nil {
+		return err
 	}
 	update := bson.M{"$addToSet": bson.M{"attributes": a}}
 	change := mgo.Change{
@@ -153,8 +156,9 @@ func (d DataModel) AddAttribute(a Attribute) error {
 }
 
 func (d DataModel) AddAttributes(list []Attribute) error {
+	//删除之前同名属性
+	d.RemoveAttributes(list)
 	for _, item := range list {
-
 		switch item.Type {
 		case modelAttributeTypeString,
 			modelAttributeTypeInt,
@@ -168,26 +172,6 @@ func (d DataModel) AddAttributes(list []Attribute) error {
 					item.Name, item.Type, d.Id)
 			}
 			item.ModelName = m.Name
-		//case modelAttributeTypeArray:
-		//	if item.ModelId > 0 {
-		//		m, err := d.FindSimpleOne(bson.M{"_id": item.ModelId}, nil)
-		//		if err != nil {
-		//			return fmt.Errorf("model attribute name:%s Type:%d id:%d not found",
-		//				item.Name, item.Type, d.Id)
-		//		}
-		//		item.ModelName = m.Name
-		//	} else {
-		//		switch item.ModelName {
-		//		case modelAttributeTypeString,
-		//			modelAttributeTypeInt,
-		//			modelAttributeTypeFloat,
-		//			modelAttributeTypeBool:
-		//			//基础数据类型不处理直接使用
-		//		default:
-		//			return fmt.Errorf("属性类型未定义")
-		//		}
-		//		return fmt.Errorf("数组元素属性类型未指定")
-		//	}
 		default:
 			return fmt.Errorf("属性类型未定义")
 		}
@@ -202,7 +186,7 @@ func (d DataModel) AddAttributes(list []Attribute) error {
 func checkNameReg(name string) error {
 	match := nameReg.FindString(name)
 	if len(match) == 0 {
-		return fmt.Errorf("attribute name not right:%s (note:^[A-Z][A-Za-z0-9_-]+$)", name)
+		return fmt.Errorf("attribute :%s not right (note:^[A-Z][A-Za-z0-9_]+$)", name)
 	}
 	return nil
 }
