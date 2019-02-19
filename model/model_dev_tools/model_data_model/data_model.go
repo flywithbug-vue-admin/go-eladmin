@@ -165,13 +165,34 @@ func (d DataModel) AddAttributes(list []Attribute) error {
 			modelAttributeTypeFloat,
 			modelAttributeTypeBool:
 			//基础数据类型不处理
-		case modelAttributeTypeObject, modelAttributeTypeArray:
+		case modelAttributeTypeObject:
 			m, err := d.FindSimpleOne(bson.M{"_id": item.ModelId}, nil)
 			if err != nil {
 				return fmt.Errorf("model attribute name:%s Type:%s id:%d not found",
 					item.Name, item.Type, d.Id)
 			}
 			item.ModelName = m.Name
+		case modelAttributeTypeArray:
+			if item.ModelId > 0 {
+				m, err := d.FindSimpleOne(bson.M{"_id": item.ModelId}, nil)
+				if err != nil {
+					return fmt.Errorf("model attribute name:%s Type:%d id:%d not found",
+						item.Name, item.Type, d.Id)
+				}
+				item.ModelName = m.Name
+			} else {
+				switch item.ModelName {
+				case modelAttributeTypeString,
+					modelAttributeTypeInt,
+					modelAttributeTypeFloat,
+					modelAttributeTypeBool:
+					//基础数据类型不处理直接使用
+				default:
+					return fmt.Errorf("属性类型未定义")
+				}
+				return fmt.Errorf("数组元素属性类型未指定")
+			}
+
 		default:
 			return fmt.Errorf("属性类型未定义")
 		}
