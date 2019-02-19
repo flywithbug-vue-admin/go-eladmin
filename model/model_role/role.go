@@ -34,7 +34,7 @@ type Role struct {
 	CreateTime  int64                         `json:"create_time,omitempty"  bson:"create_time,omitempty"`
 	Permissions []model_permission.Permission `json:"permissions,omitempty" bson:"permissions,omitempty"`
 	Label       string                        `json:"label,omitempty"  bson:"label,omitempty"`
-	PerString   []string                      `json:"per_string,omitempty" bson:"per_string,omitempty"`
+	PerStrings  []string                      `json:"per_strings,omitempty" bson:"per_strings,omitempty"`
 }
 
 func (r Role) ToJson() string {
@@ -210,7 +210,7 @@ func makeTreeList(list []Role, selector interface{}) error {
 		rp := model_role_permission.RolePermission{}
 		results, _ := rp.FindAll(bson.M{"role_id": list[index].Id}, nil)
 		list[index].Permissions = make([]model_permission.Permission, 0)
-		list[index].PerString = make([]string, 0)
+		list[index].PerStrings = make([]string, 0)
 		var per model_permission.Permission
 		for _, item := range results {
 			per.Id = item.PermissionId
@@ -220,7 +220,7 @@ func makeTreeList(list []Role, selector interface{}) error {
 			} else {
 				per.Label = per.Alias
 				list[index].Permissions = append(list[index].Permissions, per)
-				list[index].PerString = append(list[index].PerString, per.Name)
+				list[index].PerStrings = append(list[index].PerStrings, per.Name)
 				per.Alias = ""
 			}
 		}

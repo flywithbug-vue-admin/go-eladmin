@@ -228,7 +228,7 @@ func makeTreeList(list []User, selector interface{}) error {
 				log4go.Info(err.Error())
 			} else {
 				list[index].Roles = append(list[index].Roles, role)
-				rolesString = append(rolesString, role.PerString...)
+				rolesString = append(rolesString, role.PerStrings...)
 			}
 		}
 		list[index].RolesString = rolesString

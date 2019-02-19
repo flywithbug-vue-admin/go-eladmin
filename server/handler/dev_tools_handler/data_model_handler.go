@@ -97,7 +97,6 @@ func modifyAttributeHandler(c *gin.Context) {
 		aRes.SetErrorInfo(http.StatusBadRequest, "para invalid"+err.Error())
 		return
 	}
-	log4go.Info(para.ToJson())
 	c.Set(common.KeyContextPara, para.ToJson())
 	if para.Id == 0 {
 		log4go.Info(handler_common.RequestId(c) + "id is 0")

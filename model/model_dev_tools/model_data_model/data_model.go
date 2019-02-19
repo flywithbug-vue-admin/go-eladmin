@@ -176,8 +176,8 @@ func (d DataModel) AddAttributes(list []Attribute) error {
 			if item.ModelId > 0 {
 				m, err := d.FindSimpleOne(bson.M{"_id": item.ModelId}, nil)
 				if err != nil {
-					return fmt.Errorf("model attribute name:%s Type:%d id:%d not found",
-						item.Name, item.Type, d.Id)
+					return fmt.Errorf("model attribute name:%s Type:%s id:%d not found",
+						item.Name, item.Type, item.ModelId)
 				}
 				item.ModelName = m.Name
 			} else {
@@ -188,11 +188,9 @@ func (d DataModel) AddAttributes(list []Attribute) error {
 					modelAttributeTypeBool:
 					//基础数据类型不处理直接使用
 				default:
-					return fmt.Errorf("属性类型未定义")
+					return fmt.Errorf("数组元素属性类型未指定")
 				}
-				return fmt.Errorf("数组元素属性类型未指定")
 			}
-
 		default:
 			return fmt.Errorf("属性类型未定义")
 		}
