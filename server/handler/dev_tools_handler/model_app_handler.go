@@ -54,6 +54,7 @@ func updateApplicationRelationHandler(c *gin.Context) {
 		aRes.SetErrorInfo(http.StatusBadRequest, "invalid: "+err.Error())
 		return
 	}
+
 	aRes.SetSuccess()
 }
 
@@ -278,6 +279,7 @@ func addAppModelRelationHandler(c *gin.Context) {
 		aRes.SetErrorInfo(http.StatusBadRequest, "para invalid:"+msg)
 		return
 	}
+
 	err = para.Insert()
 	if err != nil {
 		log4go.Error(handler_common.RequestId(c) + err.Error())

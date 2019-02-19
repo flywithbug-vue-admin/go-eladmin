@@ -64,6 +64,12 @@ func addDataModelHandler(c *gin.Context) {
 	}
 	userId := common.UserId(c)
 	para.Owner.Id = userId
+	if para.ParentId > 0 && !para.Exist(bson.M{"_id": para.ParentId}) {
+		msg := fmt.Sprintf("parent classId:%d not exist", para.ParentId)
+		log4go.Info(handler_common.RequestId(c) + msg)
+		aRes.SetErrorInfo(http.StatusBadRequest, msg)
+		return
+	}
 	id, err := para.Insert()
 	if err != nil {
 		log4go.Info(handler_common.RequestId(c) + err.Error())
@@ -112,10 +118,11 @@ func modifyAttributeHandler(c *gin.Context) {
 			return
 		}
 	}
+
 	aRes.SetSuccess()
 }
 
-//更新alias或者name
+//更新model info alias或者name
 func updateDataModelHandler(c *gin.Context) {
 	aRes := model.NewResponse()
 	defer func() {
@@ -138,6 +145,11 @@ func updateDataModelHandler(c *gin.Context) {
 	if para.Id == 0 {
 		log4go.Info(handler_common.RequestId(c) + "id is 0")
 		aRes.SetErrorInfo(http.StatusBadRequest, "id is 0")
+		return
+	}
+	if para.ParentId > 0 && !para.Exist(bson.M{"_id": para.ParentId}) {
+		log4go.Info(handler_common.RequestId(c) + "parent model not exist")
+		aRes.SetErrorInfo(http.StatusBadRequest, "parent model not exist")
 		return
 	}
 	err = para.Update()
@@ -252,6 +264,7 @@ func listHandler(c *gin.Context) {
 		query["name"] = bson.M{"$regex": name, "$options": "i"}
 	}
 
+	selector := bson.M{"_id": 1, "name": 1, "alias": 1, "desc": 1, "create_time": 1}
 	if len(exc) > 0 {
 		excepts := strings.Split(exc, ",")
 		ids := make([]int64, len(excepts))
@@ -263,8 +276,8 @@ func listHandler(c *gin.Context) {
 
 	if appId > 0 {
 		am := model_app_data_model.AppDataModel{}
-		totalCount, _ := am.TotalCount(bson.M{"app_id": appId}, nil)
-		result, err := am.FindPageFilter(page, limit, bson.M{"app_id": appId}, nil, sort)
+		totalCount, _ := am.TotalCount(bson.M{"app_id": appId}, selector)
+		result, err := am.FindPageFilter(page, limit, bson.M{"app_id": appId}, selector, sort)
 		if err != nil {
 			log4go.Error(handler_common.RequestId(c) + err.Error())
 			aRes.SetErrorInfo(http.StatusUnauthorized, "apps find error"+err.Error())
@@ -274,7 +287,7 @@ func listHandler(c *gin.Context) {
 		for _, item := range result {
 			dm := model_data_model.DataModel{}
 			query["_id"] = item.ModelId
-			dm, err := dm.FindSimpleOne(query, nil)
+			dm, err := dm.FindSimpleOne(query, selector)
 			if err != nil {
 				continue
 			}
@@ -286,7 +299,7 @@ func listHandler(c *gin.Context) {
 	}
 	var dm = model_data_model.DataModel{}
 	totalCount, _ := dm.TotalCount(query, nil)
-	list, err := dm.FindPageFilter(page, limit, query, nil, sort)
+	list, err := dm.FindPageFilter(page, limit, query, selector, sort)
 	if err != nil {
 		log4go.Error(handler_common.RequestId(c) + err.Error())
 		aRes.SetErrorInfo(http.StatusUnauthorized, "apps find error"+err.Error())

@@ -24,7 +24,7 @@ const (
 	modelAttributeTypeInt    = "Int"    //Int类型
 	modelAttributeTypeFloat  = "Float"  //浮点数
 	modelAttributeTypeBool   = "Bool"   //布尔类型
-	modelAttributeTypeArray  = "Array"  //数组 （基础类型或者模型）
+	modelAttributeTypeArray  = "Array"  //数组 （只能是其他的类型模型 必须要有ModelId）
 	modelAttributeTypeObject = "Object" //模型
 )
 
@@ -67,7 +67,7 @@ type DataModel struct {
 	Attributes []Attribute             `json:"attributes,omitempty" bson:"attributes,omitempty"` //模型的属性表
 	Apps       []model_app.Application `json:"apps,omitempty" bson:"apps,omitempty"`             //不存入数据库
 	Owner      model_user.User         `json:"owner,omitempty" bson:"owner,omitempty"`           //模型负责人（初始为创建人）
-	ParentId   int64                   `json:"parentId,omitempty" bson:"parentId,omitempty"`
+	ParentId   int64                   `json:"parent_id,omitempty" bson:"parent_id,omitempty"`
 	Parent     interface{}             `json:"parent,omitempty" bson:"parent,omitempty"`
 }
 
@@ -160,33 +160,33 @@ func (d DataModel) AddAttributes(list []Attribute) error {
 			modelAttributeTypeFloat,
 			modelAttributeTypeBool:
 			//基础数据类型不处理
-		case modelAttributeTypeObject:
+		case modelAttributeTypeObject, modelAttributeTypeArray:
 			m, err := d.FindSimpleOne(bson.M{"_id": item.ModelId}, nil)
 			if err != nil {
 				return fmt.Errorf("model attribute name:%s Type:%s id:%d not found",
 					item.Name, item.Type, d.Id)
 			}
 			item.ModelName = m.Name
-		case modelAttributeTypeArray:
-			if item.ModelId > 0 {
-				m, err := d.FindSimpleOne(bson.M{"_id": item.ModelId}, nil)
-				if err != nil {
-					return fmt.Errorf("model attribute name:%s Type:%d id:%d not found",
-						item.Name, item.Type, d.Id)
-				}
-				item.ModelName = m.Name
-			} else {
-				switch item.ModelName {
-				case modelAttributeTypeString,
-					modelAttributeTypeInt,
-					modelAttributeTypeFloat,
-					modelAttributeTypeBool:
-					//基础数据类型不处理直接使用
-				default:
-					return fmt.Errorf("属性类型未定义")
-				}
-				return fmt.Errorf("数组元素属性类型未指定")
-			}
+		//case modelAttributeTypeArray:
+		//	if item.ModelId > 0 {
+		//		m, err := d.FindSimpleOne(bson.M{"_id": item.ModelId}, nil)
+		//		if err != nil {
+		//			return fmt.Errorf("model attribute name:%s Type:%d id:%d not found",
+		//				item.Name, item.Type, d.Id)
+		//		}
+		//		item.ModelName = m.Name
+		//	} else {
+		//		switch item.ModelName {
+		//		case modelAttributeTypeString,
+		//			modelAttributeTypeInt,
+		//			modelAttributeTypeFloat,
+		//			modelAttributeTypeBool:
+		//			//基础数据类型不处理直接使用
+		//		default:
+		//			return fmt.Errorf("属性类型未定义")
+		//		}
+		//		return fmt.Errorf("数组元素属性类型未指定")
+		//	}
 		default:
 			return fmt.Errorf("属性类型未定义")
 		}
@@ -244,9 +244,10 @@ func (d DataModel) FindOne(query, selector interface{}) (dm DataModel, err error
 		query = bson.M{"_id": dm.ParentId}
 		parent, err := d.findOne(query, selector)
 		if err != nil {
-			return dm, err
+			d.remove(query)
+		} else {
+			dm.Parent = parent
 		}
-		dm.Parent = parent
 	}
 	dm.Apps, _ = d.fetchApplications(nil)
 	result := make([]DataModel, 1)

@@ -102,15 +102,24 @@ func (a AppDataModel) Exist(query interface{}) bool {
 func (a AppDataModel) Insert() error {
 	a.Id, _ = mongo.GetIncrementId(shareDB.DocManagerDBName(), AppDataModelCollection)
 	a.CreateTime = time.Now().Unix()
-	if len(a.EndVersion) == 0 {
-		a.EndVNum = MaxVersion
-	} else {
-		a.EndVNum = common.TransformVersionToInt(a.EndVersion)
-	}
 	if len(a.StartVersion) == 0 {
 		a.StartVNum = 0
 	} else {
 		a.StartVNum = common.TransformVersionToInt(a.StartVersion)
+		if a.StartVNum == -1 {
+			return fmt.Errorf("startVersion:%s not right", a.StartVersion)
+		}
+	}
+	if len(a.EndVersion) == 0 {
+		a.EndVNum = MaxVersion
+	} else {
+		a.EndVNum = common.TransformVersionToInt(a.EndVersion)
+		if a.EndVNum == -1 {
+			return fmt.Errorf("endVersion:%s not right", a.EndVersion)
+		}
+		if a.EndVNum < a.StartVNum {
+			return fmt.Errorf("endVersion is bigger than startVersion")
+		}
 	}
 	return a.insert(a)
 }
