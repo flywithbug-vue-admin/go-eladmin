@@ -46,11 +46,12 @@ type Attribute struct {
 	Type string `json:"type,omitempty" bson:"type,omitempty"` //数据类型
 	Name string `json:"name,omitempty" bson:"name,omitempty"`
 	//attribute是数组时，数组内元素对象
-	ModelName string `json:"model_name,omitempty" bson:"model_name,omitempty"`
-	ModelId   int64  `json:"model_id,omitempty" bson:"model_id,omitempty"`
-	Default   string `json:"default,omitempty" bson:"default,omitempty"`   //默认值
-	Required  bool   `json:"required" bson:"required,omitempty"`           //是否必填 RequestPara 使用
-	Comments  string `json:"comments,omitempty" bson:"comments,omitempty"` //属性说明
+	ModelName  string `json:"model_name,omitempty" bson:"model_name,omitempty"`
+	ModelId    int64  `json:"model_id,omitempty" bson:"model_id,omitempty"`
+	Default    string `json:"default,omitempty" bson:"default,omitempty"`   //默认值
+	Required   bool   `json:"required" bson:"required,omitempty"`           //是否必填 RequestPara 使用
+	Comments   string `json:"comments,omitempty" bson:"comments,omitempty"` //属性说明
+	UpdateTime int64  `json:"update_time,omitempty" bson:"update_time,omitempty"`
 }
 
 func (a Attribute) ToJson() string {
@@ -148,6 +149,7 @@ func (d DataModel) AddAttribute(a Attribute) error {
 	change := mgo.Change{
 		Update: update,
 	}
+	a.UpdateTime = time.Now().Unix()
 	query := bson.M{"_id": d.Id}
 	ms, c := mongo.Collection(shareDB.DocManagerDBName(), dataModelCollection)
 	defer ms.Close()
