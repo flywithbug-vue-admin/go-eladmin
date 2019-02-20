@@ -32,7 +32,7 @@ func updateApplicationRelationHandler(c *gin.Context) {
 	}()
 	if check_permission.CheckNoPermission(c, model_data_model.DataModelPermissionEdit) {
 		log4go.Info(handler_common.RequestId(c) + "has no permission")
-		aRes.SetErrorInfo(http.StatusBadRequest, "has no permission")
+		aRes.SetErrorInfo(http.StatusForbidden, "has no permission")
 		return
 	}
 	para := new(model_data_model.DataModel)
@@ -66,7 +66,7 @@ func modifyAppModelVersionHandler(c *gin.Context) {
 	}()
 	if check_permission.CheckNoPermission(c, model_data_model.DataModelPermissionEdit) {
 		log4go.Info(handler_common.RequestId(c) + "has no permission")
-		aRes.SetErrorInfo(http.StatusBadRequest, "has no permission")
+		aRes.SetErrorInfo(http.StatusForbidden, "has no permission")
 		return
 	}
 	para := new(model_app_data_model.AppDataModel)
@@ -136,7 +136,7 @@ func getModelRelationAppListHandler(c *gin.Context) {
 	}()
 	if check_permission.CheckNoPermission(c, model_data_model.DataModelPermissionSelect) {
 		log4go.Info(handler_common.RequestId(c) + "has no permission")
-		aRes.SetErrorInfo(http.StatusBadRequest, "has no permission")
+		aRes.SetErrorInfo(http.StatusForbidden, "has no permission")
 		return
 	}
 	list := make([]paraModel, 0)
@@ -180,7 +180,7 @@ func appRelationModelListHandler(c *gin.Context) {
 	//}()
 	//if check_permission.CheckNoPermission(c, model_data_model.DataModelPermissionSelect) {
 	//	log4go.Info(handler_common.RequestId(c) + "has no permission")
-	//	aRes.SetErrorInfo(http.StatusBadRequest, "has no permission")
+	//	aRes.SetErrorInfo(http.StatusForbidden, "has no permission")
 	//	return
 	//}
 	//list := make([]paraModel, 0)
@@ -222,7 +222,7 @@ func removeAppModelRelationHandler(c *gin.Context) {
 	}()
 	if check_permission.CheckNoPermission(c, model_data_model.DataModelPermissionEdit) {
 		log4go.Info(handler_common.RequestId(c) + "has no permission")
-		aRes.SetErrorInfo(http.StatusBadRequest, "has no permission")
+		aRes.SetErrorInfo(http.StatusForbidden, "has no permission")
 		return
 	}
 	para := new(model_app_data_model.AppDataModel)
@@ -256,7 +256,7 @@ func addAppModelRelationHandler(c *gin.Context) {
 	}()
 	if check_permission.CheckNoPermission(c, model_data_model.DataModelPermissionEdit) {
 		log4go.Info(handler_common.RequestId(c) + "has no permission")
-		aRes.SetErrorInfo(http.StatusBadRequest, "has no permission")
+		aRes.SetErrorInfo(http.StatusForbidden, "has no permission")
 		return
 	}
 	para := new(model_app_data_model.AppDataModel)

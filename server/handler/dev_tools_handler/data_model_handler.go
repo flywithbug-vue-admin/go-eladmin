@@ -44,7 +44,7 @@ func addDataModelHandler(c *gin.Context) {
 	}()
 	if check_permission.CheckNoPermission(c, model_data_model.DataModelPermissionCreate) {
 		log4go.Info(handler_common.RequestId(c) + "has no permission")
-		aRes.SetErrorInfo(http.StatusBadRequest, "has no permission")
+		aRes.SetErrorInfo(http.StatusForbidden, "has no permission")
 		return
 	}
 	para := new(model_data_model.DataModel)
@@ -87,7 +87,7 @@ func modifyAttributeHandler(c *gin.Context) {
 	}()
 	if check_permission.CheckNoPermission(c, model_data_model.DataModelPermissionCreate) {
 		log4go.Info(handler_common.RequestId(c) + "has no permission")
-		aRes.SetErrorInfo(http.StatusBadRequest, "has no permission")
+		aRes.SetErrorInfo(http.StatusForbidden, "has no permission")
 		return
 	}
 	para := new(paraAttribute)
@@ -128,7 +128,7 @@ func updateDataModelHandler(c *gin.Context) {
 	}()
 	if check_permission.CheckNoPermission(c, model_data_model.DataModelPermissionEdit) {
 		log4go.Info(handler_common.RequestId(c) + "has no permission")
-		aRes.SetErrorInfo(http.StatusBadRequest, "has no permission")
+		aRes.SetErrorInfo(http.StatusForbidden, "has no permission")
 		return
 	}
 	para := new(model_data_model.DataModel)
@@ -166,7 +166,7 @@ func removeDataModelHandler(c *gin.Context) {
 	}()
 	if check_permission.CheckNoPermission(c, model_data_model.DataModelPermissionDelete) {
 		log4go.Info(handler_common.RequestId(c) + "has no permission")
-		aRes.SetErrorInfo(http.StatusBadRequest, "has no permission")
+		aRes.SetErrorInfo(http.StatusForbidden, "has no permission")
 		return
 	}
 	para := new(model_data_model.DataModel)
@@ -199,7 +199,7 @@ func getDataModelHandler(c *gin.Context) {
 	}()
 	if check_permission.CheckNoPermission(c, model_data_model.DataModelPermissionSelect) {
 		log4go.Info(handler_common.RequestId(c) + "has no permission")
-		aRes.SetErrorInfo(http.StatusBadRequest, "has no permission")
+		aRes.SetErrorInfo(http.StatusForbidden, "has no permission")
 		return
 	}
 	ids := c.Query("id")
@@ -228,7 +228,7 @@ func listHandler(c *gin.Context) {
 	}()
 	if check_permission.CheckNoPermission(c, model_data_model.DataModelPermissionCreate) {
 		log4go.Info(handler_common.RequestId(c) + "has no permission")
-		aRes.SetErrorInfo(http.StatusBadRequest, "has no permission")
+		aRes.SetErrorInfo(http.StatusForbidden, "has no permission")
 		return
 	}
 	limit, _ := strconv.Atoi(c.Query("size"))

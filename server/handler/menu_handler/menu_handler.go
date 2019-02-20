@@ -26,7 +26,7 @@ func addMenuHandler(c *gin.Context) {
 	}()
 	if check_permission.CheckNoPermission(c, model_menu.MenuPermissionSelect) {
 		log4go.Info(handler_common.RequestId(c) + "has no permission")
-		aRes.SetErrorInfo(http.StatusBadRequest, "has no permission")
+		aRes.SetErrorInfo(http.StatusForbidden, "has no permission")
 		return
 	}
 
@@ -61,7 +61,7 @@ func getMenuHandler(c *gin.Context) {
 	}()
 	if check_permission.CheckNoPermission(c, model_menu.MenuPermissionSelect) {
 		log4go.Info(handler_common.RequestId(c) + "has no permission")
-		aRes.SetErrorInfo(http.StatusBadRequest, "has no permission")
+		aRes.SetErrorInfo(http.StatusForbidden, "has no permission")
 		return
 	}
 
@@ -86,7 +86,7 @@ func updateMenuHandler(c *gin.Context) {
 	}()
 	if check_permission.CheckNoPermission(c, model_menu.MenuPermissionEdit) {
 		log4go.Info(handler_common.RequestId(c) + "has no permission")
-		aRes.SetErrorInfo(http.StatusBadRequest, "has no permission")
+		aRes.SetErrorInfo(http.StatusForbidden, "has no permission")
 		return
 	}
 	para := new(model_menu.Menu)
@@ -118,7 +118,7 @@ func removeMenuHandler(c *gin.Context) {
 	}()
 	if check_permission.CheckNoPermission(c, model_menu.MenuPermissionDelete) {
 		log4go.Info(handler_common.RequestId(c) + "has no permission")
-		aRes.SetErrorInfo(http.StatusBadRequest, "has no permission")
+		aRes.SetErrorInfo(http.StatusForbidden, "has no permission")
 		return
 	}
 	//need id
@@ -148,7 +148,7 @@ func getMenuListHandler(c *gin.Context) {
 
 	//if check_permission.CheckNoPermission(c, model_menu.MenuPermissionSelect) {
 	//	log4go.Info(handler_common.RequestId(c) + "has no permission")
-	//	aRes.SetErrorInfo(http.StatusBadRequest, "has no permission")
+	//	aRes.SetErrorInfo(http.StatusForbidden, "has no permission")
 	//	return
 	//}
 	var role = model_menu.Menu{}
@@ -183,7 +183,7 @@ func getMenuTreeHandler(c *gin.Context) {
 	}()
 	//if check_permission.CheckNoPermission(c, model_menu.MenuPermissionSelect) {
 	//	log4go.Info(handler_common.RequestId(c) + "has no permission")
-	//	aRes.SetErrorInfo(http.StatusBadRequest, "has no permission")
+	//	aRes.SetErrorInfo(http.StatusForbidden, "has no permission")
 	//	return
 	//}
 	var role = model_menu.Menu{}
@@ -206,7 +206,7 @@ func getMenuBuildHandler(c *gin.Context) {
 	}()
 	//if check_permission.CheckNoPermission(c, model_menu.MenuPermissionSelect) {
 	//	log4go.Info(handler_common.RequestId(c) + "has no permission")
-	//	aRes.SetErrorInfo(http.StatusBadRequest, "has no permission")
+	//	aRes.SetErrorInfo(http.StatusForbidden, "has no permission")
 	//	return
 	//}
 	sort := "+sort"
