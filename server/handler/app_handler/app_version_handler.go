@@ -1,8 +1,6 @@
 package app_handler
 
 import (
-	"encoding/json"
-	"fmt"
 	"go-eladmin/common"
 	"go-eladmin/model"
 	"go-eladmin/model/model_app"
@@ -38,8 +36,10 @@ func addAppVersionHandler(c *gin.Context) {
 		return
 	}
 	c.Set(common.KeyContextPara, para.ToJson())
+	if len(para.Version) > 0 {
+		para.VersionNum = common.TransformVersionToInt(para.Version)
+	}
 	err = para.Insert()
-
 	if err != nil {
 		log4go.Info(handler_common.RequestId(c) + err.Error())
 		aRes.SetErrorInfo(http.StatusInternalServerError, "para invalid: "+err.Error())
@@ -62,10 +62,7 @@ func updateAppVersionHandler(c *gin.Context) {
 		aRes.SetErrorInfo(http.StatusBadRequest, "para invalid: "+err.Error())
 		return
 	}
-
 	c.Set(common.KeyContextPara, para.ToJson())
-	js, _ := json.Marshal(para)
-	fmt.Println(string(js))
 	appVersion, _ := para.FindOne()
 	if check_permission.CheckNoAppVersionManagerPermission(c, appVersion) &&
 		check_permission.CheckNoPermission(c, model_app.ApplicationPermissionEdit) {
@@ -73,7 +70,9 @@ func updateAppVersionHandler(c *gin.Context) {
 		aRes.SetErrorInfo(http.StatusBadRequest, "has no permission")
 		return
 	}
-
+	if len(para.Version) > 0 {
+		para.VersionNum = common.TransformVersionToInt(para.Version)
+	}
 	err = para.Update()
 	if err != nil {
 		log4go.Info(handler_common.RequestId(c) + err.Error())
@@ -120,13 +119,13 @@ func getAppVersionListHandler(c *gin.Context) {
 	if appId > 0 {
 		query = bson.M{"app_id": appId}
 	}
-
 	if len(version) > 0 {
-		vNum := common.TransformVersionToInt(version)
-		if vNum == -1 {
-			return
-		}
-		query["version_num"] = bson.M{"$gte": vNum}
+		//vNum := common.TransformVersionToInt(version)
+		//if vNum == -1 {
+		//	return
+		//}
+		//query["version_num"] = bson.M{"$gte": vNum}
+		query["version"] = bson.M{"$regex": version, "$options": "i"}
 	}
 
 	var appV = model_app.AppVersion{}

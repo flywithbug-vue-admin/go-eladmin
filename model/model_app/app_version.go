@@ -293,7 +293,6 @@ func (app AppVersion) Update() error {
 				return fmt.Errorf("platform must like (iOS,Android,H5,Server) ")
 			}
 		}
-
 		compareState, err := common.VersionCompare(app.Version, app.ParentVersion)
 		if err != nil {
 			return err
