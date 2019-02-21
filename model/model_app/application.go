@@ -162,6 +162,7 @@ func (a Application) Remove() error {
 	if a.Id == 0 {
 		return errors.New("id is 0")
 	}
+
 	//删除app的用户关联数据
 	appM := model_app_manager.AppManager{}
 	appM.RemoveAppId(a.Id)

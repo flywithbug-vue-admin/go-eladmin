@@ -2,6 +2,7 @@ package model_module
 
 import (
 	"encoding/json"
+	"fmt"
 	"go-eladmin/core/mongo"
 	"go-eladmin/model/a_mongo_index"
 	"go-eladmin/model/model_app"
@@ -111,6 +112,51 @@ func (m Module) fetchApps() (results []model_app.Application, err error) {
 		}
 	}
 	return
+}
+
+//func (d DataModel) AddAttribute(a Attribute) error {
+//	if d.isExistAttribute(a) {
+//		return fmt.Errorf("duplicate attribute name:%s", a.Name)
+//	}
+//	if err := checkNameReg(a.Name); err != nil {
+//		return err
+//	}
+//	update := bson.M{"$addToSet": bson.M{"attributes": a}}
+//	change := mgo.Change{
+//		Update: update,
+//	}
+//	a.UpdateTime = time.Now().Unix()
+//	query := bson.M{"_id": d.Id}
+//	ms, c := mongo.Collection(shareDB.DocManagerDBName(), dataModelCollection)
+//	defer ms.Close()
+//	_, err := c.Find(query).Apply(change, nil)
+//	return err
+//}
+
+func (m Module) isExistApp(a model_app.Application) bool {
+	selector := bson.M{"_id": m.Id, "apps.id": a.Id}
+	return m.isExist(selector)
+}
+
+func (m Module) AddAppRelation(app model_app.Application) error {
+	if m.isExistApp(app) {
+		return fmt.Errorf("app exist")
+	}
+
+	return nil
+}
+func (m Module) AddAppRelations(list []model_app.Application) error {
+
+	return nil
+}
+func (m Module) RemoveRelation(app model_app.Application) error {
+
+	return nil
+}
+
+func (m Module) RemoveRelations(list []model_app.Application) error {
+
+	return nil
 }
 
 func (m Module) Update() error {

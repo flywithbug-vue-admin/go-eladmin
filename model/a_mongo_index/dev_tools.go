@@ -10,7 +10,7 @@ const (
 	CollectionDataModel    = "data_model"
 	CollectionAppDataModel = "app_data_model"
 	CollectionModule       = "module"
-	CollectionModuleApp    = "module_app"
+	CollectionApi          = "api"
 )
 
 func devToolsIndex() []Index {
@@ -41,14 +41,26 @@ func devToolsIndex() []Index {
 		},
 		{
 			DBName:     shareDB.DocManagerDBName(),
-			Collection: CollectionModuleApp,
+			Collection: CollectionModule,
 			Index: mgo.Index{
-				Key:        []string{"module_id", "app_id"},
+				Key:        []string{"name"},
 				Unique:     true,
 				DropDups:   true,
 				Background: false,
 				Sparse:     true,
-				Name:       "c_moduleId_f_appId_index",
+				Name:       "c_module_name_index",
+			},
+		},
+		{
+			DBName:     shareDB.DocManagerDBName(),
+			Collection: CollectionApi,
+			Index: mgo.Index{
+				Key:        []string{"name"},
+				Unique:     true,
+				DropDups:   true,
+				Background: false,
+				Sparse:     true,
+				Name:       "c_api_name_index",
 			},
 		},
 	}

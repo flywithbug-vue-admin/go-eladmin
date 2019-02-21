@@ -2,6 +2,7 @@ package handler
 
 import (
 	"go-eladmin/server/handler/dev_tools_handler"
+	"go-eladmin/server/handler/dev_tools_handler/module"
 	"go-eladmin/server/handler/handler_common"
 	"go-eladmin/server/handler/index_handler"
 	"go-eladmin/server/handler/log_handelr"
@@ -94,4 +95,5 @@ func addAllRouters() {
 	routerList = append(routerList, index_handler.Routers...)
 	routerList = append(routerList, monitor_handler.Routers...)
 	routerList = append(routerList, dev_tools_handler.Routers...)
+	routerList = append(routerList, module.Routers...)
 }

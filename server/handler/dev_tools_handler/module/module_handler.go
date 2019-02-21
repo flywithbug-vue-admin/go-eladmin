@@ -38,7 +38,6 @@ func addModuleHandler(c *gin.Context) {
 		log4go.Info(handler_common.RequestId(c) + msg)
 		aRes.SetErrorInfo(http.StatusBadRequest, msg)
 		return
-		return
 	}
 	id, err := para.Insert()
 	if err != nil {
