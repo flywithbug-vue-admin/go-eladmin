@@ -1,1 +1,1 @@
-{"options":{},"indexes":[{"v":1,"key":{"_id":1},"name":"_id_","ns":"docmanager.file"},{"v":1,"unique":true,"key":{"md5":1},"name":"c_file_f_md5_index","ns":"docmanager.file","sparse":true}]}
+{"options":{},"indexes":[{"v":1,"key":{"_id":1},"name":"_id_","ns":"docmanager.file"},{"v":1,"unique":true,"key":{"md5":1},"name":"c_file_f_md5_index","sparse":true,"ns":"docmanager.file"}]}

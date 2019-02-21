@@ -58,7 +58,7 @@ func Logger() gin.HandlerFunc {
 		l.Latency = end.Sub(start)
 		l.StatusCode = c.Writer.Status()
 		statusColor := colorForStatus(l.StatusCode)
-		comment := c.Errors.ByType(gin.ErrorTypePrivate).String()
+		//comment := c.Errors.ByType(gin.ErrorTypePrivate).String()
 		l.UserId = common.UserId(c)
 		l.Info = fmt.Sprintf("[GIN] [%s] [Completed]\t%s|%5d\t%3d|\t3d\t%13v|\t%s\t%s",
 			l.RequestId,
@@ -67,7 +67,8 @@ func Logger() gin.HandlerFunc {
 			l.StatusCode,
 			l.Latency,
 			l.Path,
-			comment)
+			//comment,
+		)
 
 		para := common.Para(c)
 		if para != nil {
