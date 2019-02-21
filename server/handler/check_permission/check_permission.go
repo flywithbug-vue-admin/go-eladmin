@@ -1,7 +1,6 @@
 package check_permission
 
 import (
-	"encoding/json"
 	"go-eladmin/common"
 	"go-eladmin/model/model_app"
 	"go-eladmin/model/model_user"
@@ -25,7 +24,6 @@ func CheckNoPermission(c *gin.Context, permission string) bool {
 	if err != nil {
 		return true
 	}
-	js, _ := json.Marshal(user.RolesString)
 	for index := range user.RolesString {
 		item := user.RolesString[index]
 		if strings.EqualFold(item, SUPERADMIN) {
