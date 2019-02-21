@@ -1,5 +1,8 @@
 #!/usr/bin/env bash
 
 
-go get -d -v ./...
 
+source ~/.bash_profile
+
+
+govendor sync
