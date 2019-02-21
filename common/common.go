@@ -81,7 +81,6 @@ func Capitalize(str string) string {
 				vv[i] -= 32 // string的码表相差32位
 				upperStr += string(vv[i])
 			} else {
-				fmt.Println("Not begins with lowercase letter,")
 				return str
 			}
 		} else {
