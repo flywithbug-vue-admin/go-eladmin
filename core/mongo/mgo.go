@@ -8,6 +8,7 @@ import (
 
 var sessionMap = make(map[string]*tMongo)
 
+//
 type Monger interface {
 	IsDestroyed() bool
 	Destroy()
@@ -15,12 +16,14 @@ type Monger interface {
 	Session() *mgo.Session
 	CurrentDB() string
 	Collection(c string) *mgo.Collection
+
 	// CURD
-	Insert(collection string, docs ...interface{}) error
+	Insert(collection string, docs ...interface{}) (interface{}, error)
 	Update(collection string, selector interface{}, update interface{}) error
-	Find(collection string, query interface{}, results interface{}) error
-	FindOne(collection string, query interface{}, result interface{}) error
+	FindOne(collection string, query interface{}, result interface{}) (interface{}, error)
+	FindAll(collection string, query interface{}, results interface{}) ([]interface{}, error)
 	Remove(collection string, selector interface{}) error
+	RemoveAll(collection string, selector interface{}) error
 }
 
 type tMongo struct {
@@ -71,60 +74,61 @@ func (s *tMongo) Collection(c string) *mgo.Collection {
 	return s.session.DB(s.db).C(c)
 }
 
-// CURD
-func (s *tMongo) Insert(collection string, docs ...interface{}) error {
-	if s.destroyed {
-		return errors.New(ErrMongoObjDestroyed)
-	}
-	c := s.Collection(collection)
-	if c == nil {
-		return errors.New(ErrCannotSwitchCollection + " '" + collection + "' in db '" + s.db + "'")
-	}
-	return c.Insert(docs...)
-}
-
-func (s *tMongo) Update(collection string, selector interface{}, update interface{}) error {
-	if s.destroyed {
-		return errors.New(ErrMongoObjDestroyed)
-	}
-	c := s.Collection(collection)
-	if c == nil {
-		return errors.New(ErrCannotSwitchCollection + " '" + collection + "' in db '" + s.db + "'")
-	}
-	return c.Update(selector, update)
-}
-
-func (s *tMongo) Find(collection string, query interface{}, results interface{}) error {
-	if s.destroyed {
-		return errors.New(ErrMongoObjDestroyed)
-	}
-	c := s.Collection(collection)
-	if c == nil {
-		return errors.New(ErrCannotSwitchCollection + " '" + collection + "' in db '" + s.db + "'")
-	}
-	err := c.Find(query).All(results)
-	return err
-}
-
-func (s *tMongo) FindOne(collection string, query interface{}, result interface{}) error {
-	if s.destroyed {
-		return errors.New(ErrMongoObjDestroyed)
-	}
-	c := s.Collection(collection)
-	if c == nil {
-		return errors.New(ErrCannotSwitchCollection + " '" + collection + "' in db '" + s.db + "'")
-	}
-	err := c.Find(query).One(result)
-	return err
-}
-
-func (s *tMongo) Remove(collection string, selector interface{}) error {
-	if s.destroyed {
-		return errors.New(ErrMongoObjDestroyed)
-	}
-	c := s.Collection(collection)
-	if c == nil {
-		return errors.New(ErrCannotSwitchCollection + " '" + collection + "' in db '" + s.db + "'")
-	}
-	return c.Remove(selector)
-}
+//
+//// CURD
+//func (s *tMongo) Insert(collection string, docs ...interface{}) error {
+//	if s.destroyed {
+//		return errors.New(ErrMongoObjDestroyed)
+//	}
+//	c := s.Collection(collection)
+//	if c == nil {
+//		return errors.New(ErrCannotSwitchCollection + " '" + collection + "' in db '" + s.db + "'")
+//	}
+//	return c.Insert(docs...)
+//}
+//
+//func (s *tMongo) Update(collection string, selector interface{}, update interface{}) error {
+//	if s.destroyed {
+//		return errors.New(ErrMongoObjDestroyed)
+//	}
+//	c := s.Collection(collection)
+//	if c == nil {
+//		return errors.New(ErrCannotSwitchCollection + " '" + collection + "' in db '" + s.db + "'")
+//	}
+//	return c.Update(selector, update)
+//}
+//
+//func (s *tMongo) Find(collection string, query interface{}, results interface{}) error {
+//	if s.destroyed {
+//		return errors.New(ErrMongoObjDestroyed)
+//	}
+//	c := s.Collection(collection)
+//	if c == nil {
+//		return errors.New(ErrCannotSwitchCollection + " '" + collection + "' in db '" + s.db + "'")
+//	}
+//	err := c.Find(query).All(results)
+//	return err
+//}
+//
+//func (s *tMongo) FindOne(collection string, query interface{}, result interface{}) error {
+//	if s.destroyed {
+//		return errors.New(ErrMongoObjDestroyed)
+//	}
+//	c := s.Collection(collection)
+//	if c == nil {
+//		return errors.New(ErrCannotSwitchCollection + " '" + collection + "' in db '" + s.db + "'")
+//	}
+//	err := c.Find(query).One(result)
+//	return err
+//}
+//
+//func (s *tMongo) Remove(collection string, selector interface{}) error {
+//	if s.destroyed {
+//		return errors.New(ErrMongoObjDestroyed)
+//	}
+//	c := s.Collection(collection)
+//	if c == nil {
+//		return errors.New(ErrCannotSwitchCollection + " '" + collection + "' in db '" + s.db + "'")
+//	}
+//	return c.Remove(selector)
+//}

@@ -28,10 +28,3 @@ func RegisterMongo(url, db string) error {
 	sessionMap[db] = aMongo
 	return nil
 }
-
-// NewMongo return a new mongodb operator
-func NewMongo(db string) Monger {
-	aM := new(tMongo)
-	aM.Use(db)
-	return aM
-}
