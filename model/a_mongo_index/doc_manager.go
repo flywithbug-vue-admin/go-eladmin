@@ -53,7 +53,6 @@ func docManagerIndex() []Index {
 	}
 	Indexes = append(Indexes, userPermissionIndex()...)
 	Indexes = append(Indexes, appIndex()...)
-	Indexes = append(Indexes, devToolsIndex()...)
 	return Indexes
 }
 

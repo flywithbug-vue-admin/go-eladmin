@@ -1,13 +1,13 @@
 package model
 
 import (
+	"github.com/flywithbug/mongo"
 	"testing"
-
-	"go-eladmin/core/mongo"
 )
 
 func TestUserFunctions(t *testing.T) {
-	mongo.DialMgo("doc:doc11121014a@118.89.108.25:27017/docmanager")
+	mongo.RegisterMongo("doc:doc11121014a@118.89.108.25:27017/docmanager", "docmanager")
+	//mongo.DialMgo("doc:doc11121014a@118.89.108.25:27017/docmanager")
 
 	//user := new(User)
 	//user.Password = "admin"

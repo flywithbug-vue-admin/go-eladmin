@@ -19,7 +19,6 @@ func StartServer(port, staticPath, rPrefix, authPrefix string) {
 	r.Use(static.Serve("/", static.LocalFile(staticPath, true)))
 	r.LoadHTMLGlob(staticPath + "/index.html")
 	r.NoRoute(NoRoute)
-	cors.Default()
 	r.Use(cors.New(cors.Config{
 		AllowAllOrigins:  true,
 		AllowMethods:     []string{"GET", "PUT", "POST", "DELETE"},
