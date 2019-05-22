@@ -1,1 +1,1 @@
-{"options":{},"indexes":[{"v":1,"key":{"_id":1},"name":"_id_","ns":"docmanager.data_model"},{"v":1,"unique":true,"key":{"name":1},"name":"c_data_model_f_name_index","ns":"docmanager.data_model","sparse":true}]}
+{"options":{},"indexes":[{"v":1,"key":{"_id":1},"name":"_id_","ns":"docmanager.data_model"},{"v":1,"unique":true,"key":{"name":1},"name":"c_data_model_f_name_index","sparse":true,"ns":"docmanager.data_model"}]}

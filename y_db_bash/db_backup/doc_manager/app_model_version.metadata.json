@@ -1,1 +1,1 @@
-{"options":{},"indexes":[{"v":2,"key":{"_id":1},"name":"_id_","ns":"doc_manager.app_model_version"},{"v":2,"unique":true,"key":{"model_id":1,"app_id":1},"name":"c_modelId_f_appId_index","ns":"doc_manager.app_model_version","sparse":true}],"uuid":"c7a08235cd0e4bcdb57bb9b82a7d85d7"}
+{"options":{},"indexes":[{"v":2,"key":{"_id":1},"name":"_id_","ns":"doc_manager.app_model_version"},{"v":2,"unique":true,"key":{"model_id":1,"app_id":1},"name":"c_modelId_f_appId_index","sparse":true,"ns":"doc_manager.app_model_version"}],"uuid":"ba624eca1fce4ca1806c8a3a4903a3de"}
